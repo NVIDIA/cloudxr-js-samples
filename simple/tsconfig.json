@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext", "WebWorker"],
+    "skipLibCheck": true,
+    "types": ["webxr"],
+    "baseUrl": ".",
+    "paths": {
+      "@helpers/*": ["./helpers/*"]
+    }
+  },
+  "include": ["**/*.ts", "types/**/*.d.ts"]
+}

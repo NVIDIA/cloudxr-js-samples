@@ -1,0 +1,27 @@
+# Development
+node_modules/
+build/
+.env
+.env.local
+
+# Build outputs
+*.tsbuildinfo
+.webpack/
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+generated
+dist
+
+# NPM token
+.npmrc
+Local

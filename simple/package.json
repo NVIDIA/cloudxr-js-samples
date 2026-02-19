@@ -1,0 +1,32 @@
+{
+  "name": "cloudxr-simple-example",
+  "version": "0.0.0-main",
+  "private": true,
+  "description": "CloudXR.js WebGL example application",
+  "author": "NVIDIA Corporation",
+  "license": "Apache-2.0",
+  "keywords": [],
+  "scripts": {
+    "build": "webpack --config ./webpack.prod.js",
+    "dev": "webpack --config ./webpack.dev.js",
+    "dev-server": "webpack serve --config ./webpack.dev.js --no-open",
+    "dev-server:https": "cross-env HTTPS=true webpack serve --config ./webpack.dev.js --no-open",
+    "clean": "rimraf build"
+  },
+  "dependencies": {
+    "@nvidia/cloudxr": "dev"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "@types/webxr": "^0.5.22",
+    "copy-webpack-plugin": "^13.0.0",
+    "cross-env": "^10.1.0",
+    "gl-matrix": "^3.4.3",
+    "html-webpack-plugin": "^5.6.3",
+    "rimraf": "^5.0.5",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.8.2",
+    "webpack-dev-server": "^5.2.1",
+    "webpack-cli": "^6.0.1"
+  }
+}
