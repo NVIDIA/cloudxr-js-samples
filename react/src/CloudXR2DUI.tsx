@@ -303,6 +303,10 @@ export class CloudXR2DUI {
   private setupEventListeners(): void {
     // Update configuration when form inputs change
     const updateConfig = () => this.updateConfiguration();
+    const onProfileLinkedChange = () => {
+      this.setProfileToCustomIfNeeded();
+      updateConfig();
+    };
 
     // Helper function to add listeners and store them for cleanup
     const addListener = (element: HTMLElement, event: string, handler: EventListener) => {
@@ -316,21 +320,22 @@ export class CloudXR2DUI {
     addListener(this.serverIpInput, 'change', updateConfig);
     addListener(this.portInput, 'input', updateConfig);
     addListener(this.portInput, 'change', updateConfig);
-    addListener(this.perEyeWidthInput, 'input', updateConfig);
-    addListener(this.perEyeWidthInput, 'change', updateConfig);
-    addListener(this.perEyeHeightInput, 'input', updateConfig);
-    addListener(this.perEyeHeightInput, 'change', updateConfig);
-    addListener(this.deviceFrameRateSelect, 'change', updateConfig);
-    addListener(this.maxStreamingBitrateMbpsSelect, 'change', updateConfig);
-    addListener(this.codecSelect, 'change', updateConfig);
-    addListener(this.enablePoseSmoothingSelect, 'change', updateConfig);
-    addListener(this.posePredictionFactorInput, 'change', updateConfig);
+    addListener(this.perEyeWidthInput, 'input', onProfileLinkedChange);
+    addListener(this.perEyeWidthInput, 'change', onProfileLinkedChange);
+    addListener(this.perEyeHeightInput, 'input', onProfileLinkedChange);
+    addListener(this.perEyeHeightInput, 'change', onProfileLinkedChange);
+    addListener(this.deviceFrameRateSelect, 'change', onProfileLinkedChange);
+    addListener(this.maxStreamingBitrateMbpsSelect, 'change', onProfileLinkedChange);
+    addListener(this.codecSelect, 'change', onProfileLinkedChange);
+    addListener(this.enablePoseSmoothingSelect, 'change', onProfileLinkedChange);
+    addListener(this.posePredictionFactorInput, 'change', onProfileLinkedChange);
     addListener(this.posePredictionFactorInput, 'input', () => {
+      this.setProfileToCustomIfNeeded();
       this.posePredictionFactorValue.textContent = this.posePredictionFactorInput.value;
       this.updateConfiguration();
     });
-    addListener(this.enableTexSubImage2DSelect, 'change', updateConfig);
-    addListener(this.useQuestColorWorkaroundSelect, 'change', updateConfig);
+    addListener(this.enableTexSubImage2DSelect, 'change', onProfileLinkedChange);
+    addListener(this.useQuestColorWorkaroundSelect, 'change', onProfileLinkedChange);
     addListener(this.immersiveSelect, 'change', updateConfig);
     addListener(this.appSelect, 'change', updateConfig);
     addListener(this.referenceSpaceSelect, 'change', updateConfig);
@@ -349,6 +354,7 @@ export class CloudXR2DUI {
 
     addListener(this.deviceProfileSelect, 'change', () => {
       this.applyDeviceProfileToForm(resolveDeviceProfileId(this.deviceProfileSelect.value));
+      this.persistProfileFieldsToLocalStorage();
       this.updateConfiguration();
     });
 
@@ -434,6 +440,11 @@ export class CloudXR2DUI {
     }
   }
 
+  /**
+   * Applies a device profile to the form: sets the CloudXR-related fields that the profile defines.
+   * Profile values are in @helpers/DeviceProfiles. The fields set here are profile-linked;
+   * editing any of them switches the device profile to Custom (setProfileToCustomIfNeeded).
+   */
   private applyDeviceProfileToForm(profileId: DeviceProfileId): void {
     const profile = getDeviceProfile(profileId);
     const cloudxr = profile.cloudxr;
@@ -471,6 +482,33 @@ export class CloudXR2DUI {
     }
     if (cloudxr.useQuestColorWorkaround !== undefined) {
       this.useQuestColorWorkaroundSelect.value = String(cloudxr.useQuestColorWorkaround);
+    }
+  }
+
+  /** When user edits a profile-driven setting, switch device profile to Custom and persist. */
+  private setProfileToCustomIfNeeded(): void {
+    if (this.deviceProfileSelect.value === 'custom') return;
+    this.deviceProfileSelect.value = 'custom';
+    this.updateDeviceProfileWarning('custom');
+    try {
+      localStorage.setItem('deviceProfile', 'custom');
+    } catch (_) {}
+  }
+
+  /** Persist profile-driven form fields to localStorage so they are restored on load. */
+  private persistProfileFieldsToLocalStorage(): void {
+    try {
+      localStorage.setItem('perEyeWidth', this.perEyeWidthInput.value);
+      localStorage.setItem('perEyeHeight', this.perEyeHeightInput.value);
+      localStorage.setItem('deviceFrameRate', this.deviceFrameRateSelect.value);
+      localStorage.setItem('maxStreamingBitrateMbps', this.maxStreamingBitrateMbpsSelect.value);
+      localStorage.setItem('codec', this.codecSelect.value);
+      localStorage.setItem('enablePoseSmoothing', this.enablePoseSmoothingSelect.value);
+      localStorage.setItem('posePredictionFactor', this.posePredictionFactorInput.value);
+      localStorage.setItem('enableTexSubImage2D', this.enableTexSubImage2DSelect.value);
+      localStorage.setItem('useQuestColorWorkaround', this.useQuestColorWorkaroundSelect.value);
+    } catch (e) {
+      console.warn('Failed to persist profile fields to localStorage:', e);
     }
   }
 

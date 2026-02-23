@@ -28,7 +28,7 @@ Even for development, you'll need all the pieces of a CloudXR.js deployment in o
     - a Node-based development web server
 - a CloudXR.js client
   - which is one of:
-    - an XR headset (Meta Quest 3 or Pico 4 Ultra) with its built-in Browser app
+    - an XR headset (Quest 2/3/3S or Pico 4 Ultra) with its built-in Browser app
     - a desktop browser: [Google Chrome](https://www.google.com/chrome) or Edge (IWER automatically loads for XR emulation)
   - which will run...
     - the CloudXR.js sample client _served from the development web server_.
@@ -43,7 +43,7 @@ You need both a working client and a working server in order to test. Typically 
 2. Server XR application
 3. Sample client build + web server
 4. Test from the same computer
-5. Test from an XR headset (Quest 3 or Pico 4 Ultra) or a different computer
+5. Test from an XR headset (Quest 2/3/3S or Pico 4 Ultra) or a different computer
 
 > **Quick Start Tip:** For the fastest way to get a server running, try [LÖVR](https://github.com/NVIDIA/cloudxr-lovr-sample) - a lightweight VR framework that's great for testing your CloudXR.js client setup.
 

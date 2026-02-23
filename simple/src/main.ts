@@ -205,11 +205,25 @@ class CloudXRClient {
     // Set initial display value
     this.posePredictionFactorValue.textContent = this.posePredictionFactorInput.value;
 
-    // Initialize device profile selection (do not override saved values yet)
+    // Initialize device profile from restored value (do not overwrite form; form was restored from localStorage)
     this.setDeviceProfile(resolveDeviceProfileId(this.deviceProfileSelect.value), false);
     this.deviceProfileSelect.addEventListener('change', () => {
       this.setDeviceProfile(resolveDeviceProfileId(this.deviceProfileSelect.value), true);
+      this.persistProfileFieldsToLocalStorage();
     });
+
+    this.setProfileToCustomOnProfileLinkedChange(this.perEyeWidthInput, 'input');
+    this.setProfileToCustomOnProfileLinkedChange(this.perEyeWidthInput, 'change');
+    this.setProfileToCustomOnProfileLinkedChange(this.perEyeHeightInput, 'input');
+    this.setProfileToCustomOnProfileLinkedChange(this.perEyeHeightInput, 'change');
+    this.setProfileToCustomOnProfileLinkedChange(this.deviceFrameRateSelect, 'change');
+    this.setProfileToCustomOnProfileLinkedChange(this.maxStreamingBitrateMbpsSelect, 'change');
+    this.setProfileToCustomOnProfileLinkedChange(this.codecSelect, 'change');
+    this.setProfileToCustomOnProfileLinkedChange(this.enablePoseSmoothingSelect, 'change');
+    this.setProfileToCustomOnProfileLinkedChange(this.posePredictionFactorInput, 'change');
+    this.setProfileToCustomOnProfileLinkedChange(this.posePredictionFactorInput, 'input');
+    this.setProfileToCustomOnProfileLinkedChange(this.enableTexSubImage2DSelect, 'change');
+    this.setProfileToCustomOnProfileLinkedChange(this.useQuestColorWorkaroundSelect, 'change');
 
     // Configure proxy information and port placeholder based on protocol
     if (window.location.protocol === 'https:') {
@@ -664,6 +678,22 @@ class CloudXRClient {
     return this.deviceProfile.web?.powerPreference ?? 'high-performance';
   }
 
+  private setProfileToCustomIfNeeded(): void {
+    if (this.deviceProfileSelect.value === 'custom') return;
+    this.deviceProfileSelect.value = 'custom';
+    this.setDeviceProfile('custom', false);
+    try {
+      localStorage.setItem('deviceProfile', 'custom');
+    } catch (_) {}
+  }
+
+  private setProfileToCustomOnProfileLinkedChange(
+    element: HTMLInputElement | HTMLSelectElement,
+    event: string
+  ): void {
+    element.addEventListener(event, () => this.setProfileToCustomIfNeeded());
+  }
+
   private setDeviceProfile(profileId: DeviceProfileId, applyToUi: boolean): void {
     this.deviceProfileId = profileId;
     this.deviceProfile = getDeviceProfile(profileId);
@@ -721,6 +751,22 @@ class CloudXRClient {
     }
     if (cloudxr.enableTexSubImage2D !== undefined) {
       this.enableTexSubImage2DSelect.value = String(cloudxr.enableTexSubImage2D);
+    }
+  }
+
+  private persistProfileFieldsToLocalStorage(): void {
+    try {
+      localStorage.setItem('perEyeWidth', this.perEyeWidthInput.value);
+      localStorage.setItem('perEyeHeight', this.perEyeHeightInput.value);
+      localStorage.setItem('deviceFrameRate', this.deviceFrameRateSelect.value);
+      localStorage.setItem('maxStreamingBitrateMbps', this.maxStreamingBitrateMbpsSelect.value);
+      localStorage.setItem('codec', this.codecSelect.value);
+      localStorage.setItem('enablePoseSmoothing', this.enablePoseSmoothingSelect.value);
+      localStorage.setItem('posePredictionFactor', this.posePredictionFactorInput.value);
+      localStorage.setItem('enableTexSubImage2D', this.enableTexSubImage2DSelect.value);
+      localStorage.setItem('useQuestColorWorkaround', this.useQuestColorWorkaroundSelect.value);
+    } catch (e) {
+      console.warn('Failed to persist profile fields to localStorage:', e);
     }
   }
 
