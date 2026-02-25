@@ -22,214 +22,235 @@
  * React Three UIKit. It provides:
  * - CloudXR branding and title display
  * - Server connection information and status display
- * - Interactive control buttons (Start Teleop, Reset Teleop, Disconnect)
+ * - Generic interactive action buttons (Action 1, Action 2, Disconnect)
  * - Responsive button layout with hover effects
  * - Integration with parent component event handlers
  * - Configurable position and rotation in world space for flexible UI placement
+ * - Draggable handle bar for repositioning the UI in 3D space
+ * - Face-camera rotation for optimal viewing angle (Y-axis only)
  *
  * The UI is positioned in 3D space and designed for VR/AR interaction with
  * visual feedback and clear button labeling. All interactions are passed
  * back to the parent component through callback props.
  */
 
+import { useFrame } from '@react-three/fiber';
+import { Handle, HandleTarget } from '@react-three/handle';
 import { Container, Text, Image } from '@react-three/uikit';
 import { Button } from '@react-three/uikit-default';
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
+import { Color, Euler, Group, Mesh, MeshStandardMaterial, Quaternion, Vector3 } from 'three';
+import { damp } from 'three/src/math/MathUtils.js';
+
+const FACE_CAMERA_DAMPING = 10;
 
 interface CloudXRUIProps {
-  onStartTeleop?: () => void;
+  onAction1?: () => void;
+  onAction2?: () => void;
   onDisconnect?: () => void;
-  onResetTeleop?: () => void;
   serverAddress?: string;
   sessionStatus?: string;
-  playLabel?: string;
-  playDisabled?: boolean;
-  countdownSeconds?: number;
-  onCountdownIncrease?: () => void;
-  onCountdownDecrease?: () => void;
-  countdownDisabled?: boolean;
   position?: [number, number, number];
   rotation?: [number, number, number];
 }
 
+// Reusable objects for face-camera rotation (avoid allocations in render loop)
+const eulerHelper = new Euler();
+const quaternionHelper = new Quaternion();
+const cameraPositionHelper = new Vector3();
+const uiPositionHelper = new Vector3();
+const zAxis = new Vector3(0, 0, 1);
+
+const HANDLE_COLOR_DEFAULT = new Color('#666666');
+const HANDLE_COLOR_HOVER = new Color('#aaaaaa');
+
 export default function CloudXR3DUI({
-  onStartTeleop,
+  onAction1,
+  onAction2,
   onDisconnect,
-  onResetTeleop,
   serverAddress = '127.0.0.1',
   sessionStatus = 'Disconnected',
-  playLabel = 'Play',
-  playDisabled = false,
-  countdownSeconds,
-  onCountdownIncrease,
-  onCountdownDecrease,
-  countdownDisabled = false,
   position = [1.8, 1.75, -1.3],
   rotation = [0, -0.3, 0],
 }: CloudXRUIProps) {
+  const groupRef = useRef<Group>(null);
+  const handleRef = useRef<Mesh>(null);
+
+  useEffect(() => {
+    if (groupRef.current) {
+      groupRef.current.position.set(position[0], position[1], position[2]);
+    }
+  }, [position[0], position[1], position[2]]);
+
+  // Face-camera rotation: smoothly rotate UI to face the user (Y-axis only)
+  useFrame((state, dt) => {
+    if (groupRef.current === null) {
+      return;
+    }
+    state.camera.getWorldPosition(cameraPositionHelper);
+    groupRef.current.getWorldPosition(uiPositionHelper);
+    quaternionHelper.setFromUnitVectors(
+      zAxis,
+      cameraPositionHelper.sub(uiPositionHelper).normalize()
+    );
+    eulerHelper.setFromQuaternion(quaternionHelper, 'YXZ');
+    groupRef.current.rotation.y = damp(
+      groupRef.current.rotation.y,
+      eulerHelper.y,
+      FACE_CAMERA_DAMPING,
+      dt
+    );
+  });
+
   return (
-    <group position={position} rotation={rotation}>
-      <Container
-        pixelSize={0.001}
-        width={1920}
-        height={1584}
-        alignItems="center"
-        justifyContent="center"
-        pointerEvents="auto"
-        padding={40}
-        sizeX={3}
-        sizeY={2.475}
+    <HandleTarget>
+      <group
+        ref={groupRef}
+        position={position}
+        rotation={rotation}
+        pointerEventsType={{ deny: 'grab' }}
       >
+        {/* Drag Handle Bar - grab to reposition the panel */}
+        <Handle
+          handleRef={handleRef}
+          targetRef={groupRef}
+          scale={false}
+          multitouch={false}
+          rotate={false}
+        >
+          <mesh
+            ref={handleRef}
+            position={[0, -0.4, 0.01]}
+            onPointerEnter={() => {
+              const mat = handleRef.current?.material as MeshStandardMaterial | undefined;
+              if (mat) {
+                mat.color.copy(HANDLE_COLOR_HOVER);
+                mat.opacity = 0.9;
+              }
+            }}
+            onPointerLeave={() => {
+              const mat = handleRef.current?.material as MeshStandardMaterial | undefined;
+              if (mat) {
+                mat.color.copy(HANDLE_COLOR_DEFAULT);
+                mat.opacity = 0.6;
+              }
+            }}
+          >
+            <boxGeometry args={[1.0, 0.05, 0.02]} />
+            <meshStandardMaterial color="#666666" transparent opacity={0.6} roughness={0.5} />
+          </mesh>
+        </Handle>
+
         <Container
-          width={1600}
-          height={900}
-          backgroundColor="rgba(40, 40, 40, 0.85)"
-          borderRadius={20}
-          padding={60}
-          paddingBottom={80}
+          pixelSize={0.001}
+          width={1920}
+          height={1584}
           alignItems="center"
           justifyContent="center"
-          flexDirection="column"
-          gap={36}
+          pointerEvents="auto"
+          padding={40}
+          sizeX={3}
+          sizeY={2.475}
         >
-          {/* Title */}
-          <Text fontSize={96} fontWeight="bold" color="white" textAlign="center">
-            Controls
-          </Text>
-
-          {/* Server Info */}
-          <Text fontSize={48} color="white" textAlign="center" marginBottom={24}>
-            Server address: {serverAddress}
-          </Text>
-          <Text fontSize={48} color="white" textAlign="center" marginBottom={48}>
-            Session status: {sessionStatus}
-          </Text>
-
-          {/* Countdown Config Row */}
-          <Container flexDirection="row" gap={24} alignItems="center" justifyContent="center">
-            <Text fontSize={40} color="white">
-              Countdown
-            </Text>
-            <Button
-              onClick={onCountdownDecrease}
-              variant="default"
-              width={105}
-              height={105}
-              borderRadius={52.5}
-              backgroundColor="rgba(220, 220, 220, 0.9)"
-              disabled={countdownDisabled}
-            >
-              <Text fontSize={48} color="black" fontWeight="bold">
-                -
-              </Text>
-            </Button>
-            <Container
-              width={180}
-              height={105}
-              alignItems="center"
-              justifyContent="center"
-              backgroundColor="rgba(255,255,255,0.9)"
-              borderRadius={12}
-            >
-              <Text fontSize={56} color="black">
-                {countdownSeconds}s
-              </Text>
-            </Container>
-            <Button
-              onClick={onCountdownIncrease}
-              variant="default"
-              width={105}
-              height={105}
-              borderRadius={52.5}
-              backgroundColor="rgba(220, 220, 220, 0.9)"
-              disabled={countdownDisabled}
-            >
-              <Text fontSize={48} color="black" fontWeight="bold">
-                +
-              </Text>
-            </Button>
-          </Container>
-
-          {/* Button Grid */}
           <Container
-            flexDirection="column"
-            gap={60}
+            width={1600}
+            height={900}
+            backgroundColor="rgba(40, 40, 40, 0.85)"
+            borderRadius={20}
+            padding={60}
+            paddingBottom={80}
             alignItems="center"
             justifyContent="center"
-            width="100%"
+            flexDirection="column"
+            gap={36}
           >
-            {/* Start/reset row*/}
-            <Container flexDirection="row" gap={60} justifyContent="center">
-              <Button
-                onClick={onStartTeleop}
-                variant="default"
-                width={480}
-                height={120}
-                borderRadius={40}
-                backgroundColor="rgba(220, 220, 220, 0.9)"
-                hover={{
-                  backgroundColor: 'rgba(100, 150, 255, 1)',
-                  borderColor: 'white',
-                  borderWidth: 2,
-                }}
-                disabled={playDisabled}
-              >
-                <Container flexDirection="row" alignItems="center" gap={12}>
-                  {playLabel === 'Play' && <Image src="./play-circle.svg" width={60} height={60} />}
-                  <Text fontSize={48} color="black" fontWeight="medium">
-                    {playLabel}
-                  </Text>
-                </Container>
-              </Button>
+            {/* Title */}
+            <Text fontSize={96} fontWeight="bold" color="white" textAlign="center">
+              Controls
+            </Text>
 
-              <Button
-                onClick={onResetTeleop}
-                variant="default"
-                width={480}
-                height={120}
-                borderRadius={40}
-                backgroundColor="rgba(220, 220, 220, 0.9)"
-                hover={{
-                  backgroundColor: 'rgba(100, 150, 255, 1)',
-                  borderColor: 'white',
-                  borderWidth: 2,
-                }}
-              >
-                <Container flexDirection="row" alignItems="center" gap={12}>
-                  <Image src="./arrow-uturn-left.svg" width={60} height={60} />
-                  <Text fontSize={48} color="black" fontWeight="medium">
-                    Reset
-                  </Text>
-                </Container>
-              </Button>
-            </Container>
+            {/* Server Info */}
+            <Text fontSize={48} color="white" textAlign="center" marginBottom={24}>
+              Server address: {serverAddress}
+            </Text>
+            <Text fontSize={48} color="white" textAlign="center" marginBottom={48}>
+              Session status: {sessionStatus}
+            </Text>
 
-            {/* Bottom Row */}
-            <Container flexDirection="row" justifyContent="center">
-              <Button
-                onClick={onDisconnect}
-                variant="destructive"
-                width={330}
-                height={105}
-                borderRadius={35}
-                backgroundColor="rgba(255, 150, 150, 0.9)"
-                hover={{
-                  backgroundColor: 'rgba(255, 50, 50, 1)',
-                  borderColor: 'white',
-                  borderWidth: 2,
-                }}
-              >
-                <Container flexDirection="row" alignItems="center" gap={12}>
-                  <Image src="./arrow-left-start-on-rectangle.svg" width={60} height={60} />
-                  <Text fontSize={40} color="black" fontWeight="medium">
-                    Disconnect
+            {/* Button Grid */}
+            <Container
+              flexDirection="column"
+              gap={60}
+              alignItems="center"
+              justifyContent="center"
+              width="100%"
+            >
+              {/* Action buttons row */}
+              <Container flexDirection="row" gap={60} justifyContent="center">
+                <Button
+                  onClick={onAction1}
+                  variant="default"
+                  width={480}
+                  height={120}
+                  borderRadius={40}
+                  backgroundColor="rgba(220, 220, 220, 0.9)"
+                  hover={{
+                    backgroundColor: 'rgba(100, 150, 255, 1)',
+                    borderColor: 'white',
+                    borderWidth: 2,
+                  }}
+                >
+                  <Text fontSize={48} color="black" fontWeight="medium">
+                    Action 1
                   </Text>
-                </Container>
-              </Button>
+                </Button>
+
+                <Button
+                  onClick={onAction2}
+                  variant="default"
+                  width={480}
+                  height={120}
+                  borderRadius={40}
+                  backgroundColor="rgba(220, 220, 220, 0.9)"
+                  hover={{
+                    backgroundColor: 'rgba(100, 150, 255, 1)',
+                    borderColor: 'white',
+                    borderWidth: 2,
+                  }}
+                >
+                  <Text fontSize={48} color="black" fontWeight="medium">
+                    Action 2
+                  </Text>
+                </Button>
+              </Container>
+
+              {/* Bottom Row */}
+              <Container flexDirection="row" justifyContent="center">
+                <Button
+                  onClick={onDisconnect}
+                  variant="destructive"
+                  width={330}
+                  height={105}
+                  borderRadius={35}
+                  backgroundColor="rgba(255, 150, 150, 0.9)"
+                  hover={{
+                    backgroundColor: 'rgba(255, 50, 50, 1)',
+                    borderColor: 'white',
+                    borderWidth: 2,
+                  }}
+                >
+                  <Container flexDirection="row" alignItems="center" gap={12}>
+                    <Image src="./arrow-left-start-on-rectangle.svg" width={60} height={60} />
+                    <Text fontSize={40} color="black" fontWeight="medium">
+                      Disconnect
+                    </Text>
+                  </Container>
+                </Button>
+              </Container>
             </Container>
           </Container>
         </Container>
-      </Container>
-    </group>
+      </group>
+    </HandleTarget>
   );
 }

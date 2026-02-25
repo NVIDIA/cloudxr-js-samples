@@ -23,6 +23,7 @@
     "@nvidia/cloudxr": "dev",
     "@react-three/drei": "^10.6.1",
     "@react-three/fiber": "^9.3.0",
+    "@react-three/handle": "^6.6.28",
     "@react-three/uikit": "^1.0.0",
     "@react-three/uikit-default": "^1.0.0",
     "@react-three/xr": "^6.6.22",
