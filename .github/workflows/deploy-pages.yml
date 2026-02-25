@@ -111,7 +111,7 @@ jobs:
           mkdir -p deploy/simple deploy/react
           cp -r simple/build/. deploy/simple/
           cp -r react/build/. deploy/react/
-          echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>CloudXR JS Samples</title></head><body><h1>CloudXR JS Samples</h1><ul><li><a href="./simple/">Simple</a></li><li><a href="./react/">React</a></li></ul></body></html>' > deploy/index.html
+          echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>NVIDIA CloudXR.js Samples</title></head><body><h1>NVIDIA CloudXR.js Samples</h1><ul><li><a href="./simple/index.html">Simple</a></li><li><a href="./react/index.html">React</a></li></ul></body></html>' > deploy/index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
