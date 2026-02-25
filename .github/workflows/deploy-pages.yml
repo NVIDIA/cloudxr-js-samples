@@ -1,0 +1,135 @@
+# Build the sample app in CI and deploy to GitHub Pages.
+# - PR (same-repo only): build only; NGC_API_KEY used only if PR author is in allowlist.
+# - Push to main: build + deploy (latest).
+# - workflow_dispatch: build + deploy.
+#
+# Allowlist for NGC on PRs: Repo Settings → Variables → ALLOWED_NGC_PR_AUTHORS
+# (comma-separated GitHub logins, e.g. "alice,bob"). Empty = no one gets NGC on PRs.
+# Optional: Repo variable PAGES_ARTIFACT_RETENTION_DAYS (days until artifact expires; default 1).
+# Required: Repo Settings → Pages → Source = "GitHub Actions".
+
+name: Deploy sample to GitHub Pages
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: 'pages-${{ github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  # Allowlist: run build for same-repo PRs only; use_ngc_key = true for push/dispatch or allowlisted PR author.
+  check:
+    runs-on: ubuntu-latest
+    permissions: {}
+    outputs:
+      run_build: ${{ steps.allowlist.outputs.run }}
+      use_ngc_key: ${{ steps.allowlist.outputs.use_ngc_key }}
+    steps:
+      - id: allowlist
+        env:
+          ALLOWED: ${{ vars.ALLOWED_NGC_PR_AUTHORS }}
+        run: |
+          if [ "${{ github.event_name }}" != 'pull_request' ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "use_ngc_key=true" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "use_ngc_key=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            ACTOR="${{ github.actor }}"
+            case ",${ALLOWED}," in
+              *",${ACTOR},"*) echo "use_ngc_key=true" >> "$GITHUB_OUTPUT" ;;
+              *) echo "use_ngc_key=false" >> "$GITHUB_OUTPUT" ;;
+            esac
+          fi
+
+  build:
+    needs: check
+    if: needs.check.outputs.run_build == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set SDK version
+        id: sdk_version
+        run: echo "version=6.1.0-rc3" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Download SDK tarball from NGC (api.ngc.nvidia.com per NGC Catalog User Guide).
+      # NGC_API_KEY only passed when needs.check.outputs.use_ngc_key is true (push/dispatch or allowlisted PR author).
+      - name: Download CloudXR Web SDK from NGC
+        env:
+          NGC_API_KEY: ${{ needs.check.outputs.use_ngc_key == 'true' && secrets.NGC_API_KEY }}
+          SDK_VERSION: ${{ steps.sdk_version.outputs.version }}
+        run: |
+          SDK_FILE="nvidia-cloudxr-${SDK_VERSION}.tgz"
+          BASE="https://api.ngc.nvidia.com/v2"
+          if [ -z "$NGC_API_KEY" ]; then
+            URL="${BASE}/resources/nvidia/cloudxr-js/versions/${SDK_VERSION}/files/${SDK_FILE}?download=true"
+            curl -fL -o "${SDK_FILE}" "$URL"
+          else
+            URL="${BASE}/org/0566138804516934/team/cloudxr-dev/resources/cloudxr-js/versions/${SDK_VERSION}/files/${SDK_FILE}"
+            curl -fL -o "${SDK_FILE}" \
+              -H "Authorization: Bearer $NGC_API_KEY" \
+              -H "Content-Type: application/json" \
+              "$URL"
+          fi
+          echo "sdk_tgz=${SDK_FILE}" >> "$GITHUB_ENV"
+
+      - name: Install and build (simple)
+        env:
+          SDK_TGZ: ${{ env.sdk_tgz }}
+        run: |
+          cd simple
+          npm install "../${SDK_TGZ}"
+          npm run build
+
+      - name: Install and build (react)
+        env:
+          SDK_TGZ: ${{ env.sdk_tgz }}
+        run: |
+          cd react
+          npm install "../${SDK_TGZ}"
+          npm run build
+
+      - name: Prepare Pages artifact (simple + react)
+        run: |
+          mkdir -p deploy/simple deploy/react
+          cp -r simple/build/. deploy/simple/
+          cp -r react/build/. deploy/react/
+          echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>NVIDIA CloudXR.js Samples</title></head><body><h1>NVIDIA CloudXR.js Samples</h1><ul><li><a href="./simple/index.html">Simple</a></li><li><a href="./react/index.html">React</a></li></ul></body></html>' > deploy/index.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: deploy
+          retention-days: ${{ vars.PAGES_ARTIFACT_RETENTION_DAYS || 3 }}
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
