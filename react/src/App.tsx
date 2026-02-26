@@ -26,7 +26,7 @@
  * - Entry point for AR/VR experiences with CloudXR streaming
  *
  * The app integrates with the HTML interface which provides a "CONNECT" button
- * to enter AR mode and displays the CloudXR UI with controls for teleop actions
+ * to enter AR mode and displays the CloudXR UI with generic action buttons
  * and disconnect when in XR mode.
  */
 
@@ -38,6 +38,7 @@ import { kPerformanceOptions } from '@helpers/PerformanceProfiles';
 import CloudXRComponent from '@helpers/react/CloudXRComponent';
 import { SimpleEnvironment } from '@helpers/react/SimpleEnvironment';
 import * as CloudXR from '@nvidia/cloudxr';
+import { getResolutionValidationError } from '@nvidia/cloudxr';
 import { Canvas } from '@react-three/fiber';
 import { setPreferredColorScheme } from '@react-three/uikit';
 import { XR, createXRStore, noEvents, PointerEvents, XROrigin, useXR } from '@react-three/xr';
@@ -51,16 +52,7 @@ overridePressureObserver();
 
 setPreferredColorScheme('dark');
 
-const START_TELEOP_COMMAND = {
-  type: 'teleop_command',
-  message: {
-    command: 'start teleop',
-  },
-} as const;
-
 function App() {
-  const COUNTDOWN_MAX_SECONDS = 9;
-  const COUNTDOWN_STORAGE_KEY = 'cxr.react.countdownSeconds';
   // 2D UI management
   const [cloudXR2DUI, setCloudXR2DUI] = useState<CloudXR2DUI | null>(null);
   // IWER loading state
@@ -80,30 +72,6 @@ function App() {
   const [isXRMode, setIsXRMode] = useState(false);
   // Server address being used for connection
   const [serverAddress, setServerAddress] = useState<string>('');
-  // Teleop countdown and state
-  const [isCountingDown, setIsCountingDown] = useState(false);
-  const [countdownRemaining, setCountdownRemaining] = useState(0);
-  const [isTeleopRunning, setIsTeleopRunning] = useState(false);
-  const countdownTimerRef = useRef<number | null>(null);
-  const [countdownDuration, setCountdownDuration] = useState<number>(() => {
-    try {
-      const saved = localStorage.getItem(COUNTDOWN_STORAGE_KEY);
-      if (saved != null) {
-        const value = parseInt(saved, 10);
-        if (!isNaN(value)) {
-          return Math.min(COUNTDOWN_MAX_SECONDS, Math.max(0, value));
-        }
-      }
-    } catch (_) {}
-    return 3;
-  });
-
-  // Persist countdown duration on change
-  useEffect(() => {
-    try {
-      localStorage.setItem(COUNTDOWN_STORAGE_KEY, String(countdownDuration));
-    } catch (_) {}
-  }, [countdownDuration]);
 
   // Load IWER first (must happen before anything else)
   // Note: React Three Fiber's emulation is disabled (emulate: false) to avoid conflicts
@@ -192,6 +160,7 @@ function App() {
 
       setCapabilitiesValid(true);
       cloudXR2DUI.setStartButtonState(false, 'CONNECT');
+      cloudXR2DUI.updateConnectButtonState();
     };
 
     checkCapabilitiesOnce();
@@ -243,8 +212,17 @@ function App() {
     ui.initialize();
     ui.setupConnectButtonHandler(
       async () => {
+        const config = ui.getConfiguration();
+        const resolutionError = getResolutionValidationError(
+          config.perEyeWidth,
+          config.perEyeHeight
+        );
+        if (resolutionError) {
+          setErrorMessage(resolutionError);
+          return;
+        }
         // Start XR session
-        if (ui.getConfiguration().immersiveMode === 'ar') {
+        if (config.immersiveMode === 'ar') {
           await store.enterAR();
         } else if (ui.getConfiguration().immersiveMode === 'vr') {
           await store.enterVR();
@@ -313,6 +291,7 @@ function App() {
         setIsXRMode(false);
         if (cloudXR2DUI) {
           cloudXR2DUI.setStartButtonState(false, 'CONNECT');
+          cloudXR2DUI.updateConnectButtonState();
         }
 
         if (xrState.error) {
@@ -382,147 +361,24 @@ function App() {
   };
 
   // UI Event Handlers
-  const handleStartTeleop = async () => {
-    console.log('Start Teleop pressed');
-
-    if (!cloudXRSession) {
-      console.error('CloudXR session not available');
-      return;
-    }
-
-    if (isCountingDown || isTeleopRunning) {
-      return;
-    }
-
-    // Begin countdown before starting teleop (immediately if 0)
-    if (countdownDuration <= 0) {
-      setIsCountingDown(false);
-      setCountdownRemaining(0);
-
-      const success = await sendMessage(START_TELEOP_COMMAND);
-      if (success) {
-        setIsTeleopRunning(true);
-      } else {
-        setIsTeleopRunning(false);
-      }
-      return;
-    }
-
-    setIsCountingDown(true);
-    setCountdownRemaining(countdownDuration);
-
-    countdownTimerRef.current = window.setInterval(() => {
-      setCountdownRemaining(prev => {
-        if (prev <= 1) {
-          // Countdown finished
-          if (countdownTimerRef.current !== null) {
-            clearInterval(countdownTimerRef.current);
-            countdownTimerRef.current = null;
-          }
-          setIsCountingDown(false);
-
-          // Send start teleop command
-          sendMessage(START_TELEOP_COMMAND).then(success => {
-            if (success) {
-              setIsTeleopRunning(true);
-            } else {
-              setIsTeleopRunning(false);
-            }
-          });
-
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  const handleStopTeleop = async () => {
-    console.log('Stop Teleop pressed');
-
-    // If countdown is active, cancel it and reset state
-    if (isCountingDown) {
-      if (countdownTimerRef.current !== null) {
-        clearInterval(countdownTimerRef.current);
-        countdownTimerRef.current = null;
-      }
-      setIsCountingDown(false);
-      setCountdownRemaining(0);
-      return;
-    }
-
-    if (!cloudXRSession) {
-      console.error('CloudXR session not available');
-      return;
-    }
-
-    // Send stop teleop command
-    const teleopCommand = {
-      type: 'teleop_command',
-      message: {
-        command: 'stop teleop',
-      },
-    };
-
-    const success = await sendMessage(teleopCommand);
-    if (success) {
-      setIsTeleopRunning(false);
+  const handleAction1 = async () => {
+    console.log('Action 1 pressed');
+    const success = await sendMessage({ type: 'action', message: { action: 'action_1' } });
+    if (!success) {
+      console.error('Failed to send Action 1 message');
     }
   };
 
-  const handleResetTeleop = async () => {
-    console.log('Reset Teleop pressed');
-
-    // Cancel any active countdown
-    if (countdownTimerRef.current !== null) {
-      clearInterval(countdownTimerRef.current);
-      countdownTimerRef.current = null;
-    }
-    setIsCountingDown(false);
-    setCountdownRemaining(0);
-
-    if (!cloudXRSession) {
-      console.error('CloudXR session not available');
-      return;
-    }
-
-    // Send stop teleop command first
-    const stopCommand = {
-      type: 'teleop_command',
-      message: {
-        command: 'stop teleop',
-      },
-    };
-
-    // Send reset teleop command
-    const resetCommand = {
-      type: 'teleop_command',
-      message: {
-        command: 'reset teleop',
-      },
-    };
-
-    const stopSuccess = await sendMessage(stopCommand);
-    if (stopSuccess) {
-      const resetSuccess = await sendMessage(resetCommand);
-      if (resetSuccess) {
-        setIsTeleopRunning(false);
-      }
+  const handleAction2 = async () => {
+    console.log('Action 2 pressed');
+    const success = await sendMessage({ type: 'action', message: { action: 'action_2' } });
+    if (!success) {
+      console.error('Failed to send Action 2 message');
     }
   };
 
   const handleDisconnect = () => {
     console.log('Disconnect pressed');
-
-    // Cleanup countdown state on disconnect
-    if (countdownTimerRef.current !== null) {
-      clearInterval(countdownTimerRef.current);
-      countdownTimerRef.current = null;
-    }
-    setIsCountingDown(false);
-    setCountdownRemaining(0);
-    setIsTeleopRunning(false);
-
     const xrState = store.getState();
     const session = xrState.session;
     if (session) {
@@ -532,17 +388,6 @@ function App() {
         );
       });
     }
-  };
-
-  // Countdown configuration handlers (0-5 seconds)
-  const handleIncreaseCountdown = () => {
-    if (isCountingDown) return;
-    setCountdownDuration(prev => Math.min(COUNTDOWN_MAX_SECONDS, prev + 1));
-  };
-
-  const handleDecreaseCountdown = () => {
-    if (isCountingDown) return;
-    setCountdownDuration(prev => Math.max(0, prev - 1));
   };
 
   // Memo config based on configVersion (manual dependency tracker incremented on config changes)
@@ -679,24 +524,11 @@ function App() {
                 onServerAddress={setServerAddress}
               />
               <CloudXR3DUI
-                onStartTeleop={handleStartTeleop}
-                onStopTeleop={handleStopTeleop}
+                onAction1={handleAction1}
+                onAction2={handleAction2}
                 onDisconnect={handleDisconnect}
-                onResetTeleop={handleResetTeleop}
                 serverAddress={serverAddress || config.serverIP}
                 sessionStatus={sessionStatus}
-                playLabel={
-                  isTeleopRunning
-                    ? 'Running'
-                    : isCountingDown
-                      ? `Starting in ${countdownRemaining} sec...`
-                      : 'Play'
-                }
-                playDisabled={isCountingDown || isTeleopRunning}
-                countdownSeconds={countdownDuration}
-                onCountdownIncrease={handleIncreaseCountdown}
-                onCountdownDecrease={handleDecreaseCountdown}
-                countdownDisabled={isCountingDown}
                 position={[0, 1.6, -1.8]}
                 rotation={[0, 0, 0]}
               />

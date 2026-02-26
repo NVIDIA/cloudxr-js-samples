@@ -43,10 +43,21 @@ import { kPerformanceOptions } from '@helpers/PerformanceProfiles';
 import {
   enableLocalStorage,
   getConnectionConfig,
+  getResolutionFromInputs,
   setupCertificateAcceptanceLink,
 } from '@helpers/utils';
 import { getOrCreateCanvas, logOrThrow } from '@helpers/WebGlUtils';
-import * as CloudXR from '@nvidia/cloudxr';
+import {
+  createSession,
+  getResolutionValidationError,
+  getResolutionValidationMessageForConnect,
+  type Session,
+  type SessionDelegates,
+  type SessionOptions,
+  type StreamingError,
+  SessionState,
+  validatePerEyeResolution,
+} from '@nvidia/cloudxr';
 
 // Override PressureObserver early to catch errors from buggy browser implementations
 overridePressureObserver();
@@ -71,6 +82,9 @@ class CloudXRClient {
   private statusMessageText: HTMLElement;
   private perEyeWidthInput: HTMLInputElement;
   private perEyeHeightInput: HTMLInputElement;
+  private resolutionWidthValidationMessage: HTMLElement | null;
+  private resolutionHeightValidationMessage: HTMLElement | null;
+  private capabilitiesValid = false;
   private referenceSpaceSelect: HTMLSelectElement;
   private xrOffsetXInput: HTMLInputElement;
   private xrOffsetYInput: HTMLInputElement;
@@ -93,7 +107,7 @@ class CloudXRClient {
 
   // Core Session Components
   private xrSession: XRSession | null = null; // WebXR session (hardware access)
-  private cloudxrSession: CloudXR.Session | null = null; // CloudXR session (streaming)
+  private cloudxrSession: Session | null = null; // CloudXR session (streaming)
   private gl: WebGL2RenderingContext | null = null; // WebGL context (rendering)
   private baseLayer: XRWebGLLayer | null = null; // Bridge between WebXR and WebGL
   private deviceFrameRate: number = 0; // Target frame rate for XR session
@@ -149,6 +163,12 @@ class CloudXRClient {
     this.statusMessageText = document.getElementById('statusMessageText') as HTMLElement;
     this.perEyeWidthInput = document.getElementById('perEyeWidth') as HTMLInputElement;
     this.perEyeHeightInput = document.getElementById('perEyeHeight') as HTMLInputElement;
+    this.resolutionWidthValidationMessage = document.getElementById(
+      'resolutionWidthValidationMessage'
+    );
+    this.resolutionHeightValidationMessage = document.getElementById(
+      'resolutionHeightValidationMessage'
+    );
     this.referenceSpaceSelect = document.getElementById('referenceSpace') as HTMLSelectElement;
     this.xrOffsetXInput = document.getElementById('xrOffsetX') as HTMLInputElement;
     this.xrOffsetYInput = document.getElementById('xrOffsetY') as HTMLInputElement;
@@ -216,6 +236,16 @@ class CloudXRClient {
     this.setProfileToCustomOnProfileLinkedChange(this.perEyeWidthInput, 'change');
     this.setProfileToCustomOnProfileLinkedChange(this.perEyeHeightInput, 'input');
     this.setProfileToCustomOnProfileLinkedChange(this.perEyeHeightInput, 'change');
+    this.updateResolutionValidationMessage();
+    const updateResValidation = () => this.updateResolutionValidationMessage();
+    this.perEyeWidthInput.addEventListener('input', updateResValidation);
+    this.perEyeWidthInput.addEventListener('change', updateResValidation);
+    this.perEyeWidthInput.addEventListener('blur', updateResValidation);
+    this.perEyeWidthInput.addEventListener('keyup', updateResValidation);
+    this.perEyeHeightInput.addEventListener('input', updateResValidation);
+    this.perEyeHeightInput.addEventListener('change', updateResValidation);
+    this.perEyeHeightInput.addEventListener('blur', updateResValidation);
+    this.perEyeHeightInput.addEventListener('keyup', updateResValidation);
     this.setProfileToCustomOnProfileLinkedChange(this.deviceFrameRateSelect, 'change');
     this.setProfileToCustomOnProfileLinkedChange(this.maxStreamingBitrateMbpsSelect, 'change');
     this.setProfileToCustomOnProfileLinkedChange(this.codecSelect, 'change');
@@ -287,14 +317,55 @@ class CloudXRClient {
       this.showStatus('CloudXR.js SDK is supported. Ready to connect!', 'success');
     }
 
-    this.startButton.disabled = false;
-    this.startButton.innerHTML = 'CONNECT';
+    this.capabilitiesValid = true;
+    this.updateConnectButtonState();
   }
 
   private showStatus(message: string, type: 'success' | 'error' | 'info'): void {
     this.statusMessageText.textContent = message;
     this.statusMessageBox.className = `status-message-box show ${type}`;
     console[type === 'error' ? 'error' : 'info'](message);
+  }
+
+  /** Update inline resolution validation messages under each input. Uses effective resolution (HTML default when blank). */
+  private updateResolutionValidationMessage(): void {
+    const { w: wNum, h: hNum } = getResolutionFromInputs(
+      this.perEyeWidthInput,
+      this.perEyeHeightInput
+    );
+    const { widthError, heightError } = validatePerEyeResolution(wNum, hNum);
+    if (this.resolutionWidthValidationMessage) {
+      const showWidth = widthError ?? '';
+      this.resolutionWidthValidationMessage.textContent = showWidth;
+      this.resolutionWidthValidationMessage.className = showWidth
+        ? 'config-text resolution-validation-error'
+        : 'config-text';
+    }
+    if (this.resolutionHeightValidationMessage) {
+      const showHeight = heightError ?? '';
+      this.resolutionHeightValidationMessage.textContent = showHeight;
+      this.resolutionHeightValidationMessage.className = showHeight
+        ? 'config-text resolution-validation-error'
+        : 'config-text';
+    }
+    this.updateConnectButtonState();
+  }
+
+  /** Disable Connect button when resolution invalid; show validation in status box. Blank fields use HTML value attribute. */
+  private updateConnectButtonState(): void {
+    const { w, h } = getResolutionFromInputs(this.perEyeWidthInput, this.perEyeHeightInput);
+    const resolutionError = getResolutionValidationError(w, h);
+    const connectMessage = getResolutionValidationMessageForConnect(w, h);
+    if (connectMessage) {
+      this.showStatus(connectMessage, 'error');
+    } else if (this.capabilitiesValid) {
+      this.showStatus('CloudXR.js SDK is supported. Ready to connect!', 'success');
+    }
+    const shouldEnable = this.capabilitiesValid && !resolutionError;
+    this.startButton.disabled = !shouldEnable;
+    if (shouldEnable) {
+      this.startButton.innerHTML = 'CONNECT';
+    }
   }
 
   /**
@@ -317,8 +388,19 @@ class CloudXRClient {
     }
 
     const port = portValue || defaultPort;
-    const perEyeWidth = parseInt(this.perEyeWidthInput.value, 10) || 2048;
-    const perEyeHeight = parseInt(this.perEyeHeightInput.value, 10) || 1792;
+    const { w: perEyeWidth, h: perEyeHeight } = getResolutionFromInputs(
+      this.perEyeWidthInput,
+      this.perEyeHeightInput
+    );
+
+    // Validate resolution before starting XR so we never enter VR with invalid config
+    const resolutionError = getResolutionValidationError(perEyeWidth, perEyeHeight);
+    if (resolutionError) {
+      const connectMessage = getResolutionValidationMessageForConnect(perEyeWidth, perEyeHeight);
+      this.showStatus(connectMessage ?? resolutionError, 'error');
+      return;
+    }
+
     const deviceFrameRate = parseInt(this.deviceFrameRateSelect.value, 10);
     const maxStreamingBitrateKbps = parseInt(this.maxStreamingBitrateMbpsSelect.value, 10) * 1000;
     const immersiveMode = this.immersiveSelect.value as 'ar' | 'vr';
@@ -332,7 +414,7 @@ class CloudXRClient {
       this.startButton.innerHTML = 'CONNECT (connecting)';
       this.showStatus(`Connecting to Server ${serverIp}:${port}...`, 'info');
 
-      // Initialize WebGL, WebXR session, and reference space
+      // Initialize WebGL, XR session, and reference space (only after resolution is valid)
       await this.initializeWebGL();
       await this.createXRSession(immersiveMode, deviceFrameRate);
 
@@ -515,7 +597,7 @@ class CloudXRClient {
     const mediaPortValue = parseInt(this.mediaPortInput.value, 10);
     const mediaPort = !isNaN(mediaPortValue) ? mediaPortValue : undefined;
 
-    const sessionOptions: CloudXR.SessionOptions = {
+    const sessionOptions: SessionOptions = {
       serverAddress: connectionConfig.serverIP,
       serverPort: connectionConfig.port,
       useSecureConnection: connectionConfig.useSecureConnection,
@@ -539,14 +621,14 @@ class CloudXRClient {
       },
     };
 
-    const delegates: CloudXR.SessionDelegates = {
+    const delegates: SessionDelegates = {
       onStreamStarted: () => {
         console.info('CloudXR stream started');
         this.startButton.innerHTML = 'CONNECT (streaming)';
         this.exitButton.style.display = 'block';
         this.showStatus('Streaming started!', 'success');
       },
-      onStreamStopped: (error?: CloudXR.StreamingError) => {
+      onStreamStopped: (error?: StreamingError) => {
         if (error) {
           // Display user-friendly error message with error code if available
           const errorMsg = error.code
@@ -586,7 +668,7 @@ class CloudXRClient {
     };
 
     try {
-      this.cloudxrSession = CloudXR.createSession(sessionOptions, delegates);
+      this.cloudxrSession = createSession(sessionOptions, delegates);
     } catch (error) {
       console.error('Failed to create CloudXR session:', error);
       throw error;
@@ -618,7 +700,7 @@ class CloudXRClient {
       return;
     }
 
-    if (this.cloudxrSession.state !== CloudXR.SessionState.Connected) {
+    if (this.cloudxrSession.state !== SessionState.Connected) {
       console.debug('Skipping frame, session not ready');
       return;
     }
