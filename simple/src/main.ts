@@ -84,6 +84,8 @@ class CloudXRClient {
   private perEyeHeightInput: HTMLInputElement;
   private resolutionWidthValidationMessage: HTMLElement | null;
   private resolutionHeightValidationMessage: HTMLElement | null;
+  private validationMessageBox: HTMLElement;
+  private validationMessageText: HTMLElement;
   private capabilitiesValid = false;
   private referenceSpaceSelect: HTMLSelectElement;
   private xrOffsetXInput: HTMLInputElement;
@@ -161,6 +163,8 @@ class CloudXRClient {
     this.proxyDefaultText = document.getElementById('proxyDefaultText') as HTMLElement;
     this.statusMessageBox = document.getElementById('statusMessageBox') as HTMLElement;
     this.statusMessageText = document.getElementById('statusMessageText') as HTMLElement;
+    this.validationMessageBox = document.getElementById('validationMessageBox') as HTMLElement;
+    this.validationMessageText = document.getElementById('validationMessageText') as HTMLElement;
     this.perEyeWidthInput = document.getElementById('perEyeWidth') as HTMLInputElement;
     this.perEyeHeightInput = document.getElementById('perEyeHeight') as HTMLInputElement;
     this.resolutionWidthValidationMessage = document.getElementById(
@@ -327,7 +331,7 @@ class CloudXRClient {
     console[type === 'error' ? 'error' : 'info'](message);
   }
 
-  /** Update inline resolution validation messages under each input. Uses effective resolution (HTML default when blank). */
+  /** Update inline resolution validation messages under each input. */
   private updateResolutionValidationMessage(): void {
     const { w: wNum, h: hNum } = getResolutionFromInputs(
       this.perEyeWidthInput,
@@ -351,15 +355,17 @@ class CloudXRClient {
     this.updateConnectButtonState();
   }
 
-  /** Disable Connect button when resolution invalid; show validation in status box. Blank fields use HTML value attribute. */
+  /** Disable Connect button when resolution invalid; show validation in its own box. */
   private updateConnectButtonState(): void {
     const { w, h } = getResolutionFromInputs(this.perEyeWidthInput, this.perEyeHeightInput);
     const resolutionError = getResolutionValidationError(w, h);
     const connectMessage = getResolutionValidationMessageForConnect(w, h);
     if (connectMessage) {
-      this.showStatus(connectMessage, 'error');
-    } else if (this.capabilitiesValid) {
-      this.showStatus('CloudXR.js SDK is supported. Ready to connect!', 'success');
+      this.validationMessageText.textContent = connectMessage;
+      this.validationMessageBox.className = 'validation-message-box show';
+    } else {
+      this.validationMessageText.textContent = '';
+      this.validationMessageBox.className = 'validation-message-box';
     }
     const shouldEnable = this.capabilitiesValid && !resolutionError;
     this.startButton.disabled = !shouldEnable;

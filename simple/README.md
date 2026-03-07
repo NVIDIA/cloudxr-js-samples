@@ -53,10 +53,7 @@ docker stop cloudxr-js-sample && docker rm cloudxr-js-sample
 2. **Install Dependencies**
 
    ```bash
-   # For this early access release, please run the following to install SDK from the given tarball. This step will not be needed when SDK is publicly accessible.
-   npm install ../nvidia-cloudxr-6.0.1-beta.tgz
-
-   npm install
+   npm install /path/to/nvidia-cloudxr-<version>.tgz
    ```
 
 3. **Build the Application**
@@ -157,6 +154,17 @@ The `main.ts` file contains well-commented code explaining each step:
    - Renders to display
 
 Each method includes inline comments explaining the purpose and key concepts.
+
+## Documentation
+
+For comprehensive guides beyond this README, see the [NVIDIA CloudXR SDK documentation](https://docs.nvidia.com/cloudxr-sdk/latest/):
+
+- [Simple WebGL Workflow](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/sample_webgl.html) -- full build and validation walkthrough
+- [Client Setup](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/client_setup.html) -- headset browser configuration (Meta Quest, Pico 4 Ultra)
+- [Session API](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/session_api.html) -- connection lifecycle and configuration
+- [Performance Tuning](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/performance.html) -- resolution, foveation, bitrate
+- [Proxy Setup](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/proxy_setup.html) -- HTTPS/WSS proxy for device testing
+- [Troubleshooting](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/troubleshooting.html) -- common issues and diagnostics
 
 ## License
 

@@ -66,10 +66,7 @@ docker stop cloudxr-react-sample && docker rm cloudxr-react-sample
 2. **Install Dependencies**
 
    ```bash
-   # For this early access release, please run the following to install SDK from the given tarball. This step will not be needed when SDK is publicly accessible.
-   npm install ../nvidia-cloudxr-6.0.1-beta.tgz
-
-   npm install
+   npm install /path/to/nvidia-cloudxr-<version>.tgz
    ```
 
 3. **Build the Application**
@@ -250,6 +247,17 @@ The 3D UI uses React Three UIKit for modern VR/AR interfaces:
 This example uses WebGL state tracking to prevent rendering conflicts between React Three Fiber and CloudXR. Both libraries render to the same WebGL context, but CloudXR's rendering operations modify WebGL state (framebuffers, textures, buffers, VAOs, shaders, blend modes, etc.) which can interfere with React Three Fiber's expectations. The example wraps the WebGL context with `bindGL()` from `@helpers/WebGLStateBinding`, then uses CloudXR's `onWebGLStateChangeBegin` and `onWebGLStateChangeEnd` callbacks to automatically save and restore state around CloudXR's rendering. This ensures React Three Fiber always finds the WebGL context in the expected state after each CloudXR render operation.
 
 See `examples/helpers/WebGLStateBinding.ts`, `WebGLState.ts`, and `WebGLStateApply.ts` for implementation details. Comprehensive tests are available in `tests/unit/WebGLState.test.ts` and `tests/playwright/WebGLTests/src/WebGLStateBindingTests.ts`.
+
+## Documentation
+
+For comprehensive guides beyond this README, see the [NVIDIA CloudXR SDK documentation](https://docs.nvidia.com/cloudxr-sdk/latest/):
+
+- [React Sample Workflow](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/sample_react.html) -- full build and validation walkthrough
+- [Client Setup](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/client_setup.html) -- headset browser configuration (Meta Quest, Pico 4 Ultra)
+- [Session API](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/session_api.html) -- connection lifecycle, WebXR integration patterns
+- [Performance Tuning](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/performance.html) -- resolution, foveation, bitrate
+- [Proxy Setup](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/proxy_setup.html) -- HTTPS/WSS proxy for device testing
+- [Troubleshooting](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/troubleshooting.html) -- common issues and diagnostics
 
 ## License
 

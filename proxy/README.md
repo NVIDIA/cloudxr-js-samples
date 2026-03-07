@@ -2,6 +2,8 @@
 
 WebSocket SSL Proxy for CloudXR.js examples. Provides secure WSS connection to CloudXR Runtime.
 
+For comprehensive proxy setup guidance including Kubernetes deployments and certificate trust on XR headsets, see [WebSocket Proxy Setup](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/proxy_setup.html) in the CloudXR SDK documentation.
+
 ## What It Does
 
 - Provides WSS (WebSocket Secure) endpoint (default port `48322`)
@@ -121,7 +123,7 @@ If you have your own SSL certificate, you can use it instead of the auto-generat
 
 ### For XR Headsets
 
-You need to trust the certificate on your XR headset browser. See main API documentation for device-specific instructions.
+You need to trust the certificate on your XR headset browser. See [Client Setup](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/client_setup.html) for device-specific instructions.
 
 ## Architecture
 
