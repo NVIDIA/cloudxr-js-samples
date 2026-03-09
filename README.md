@@ -1,8 +1,8 @@
 # NVIDIA CloudXR.js SDK - Getting Started
 
-> **Note:** For detailed documentation, see the `docs/` folder (open `docs/index.html` in browser).
+For comprehensive documentation, see the [NVIDIA CloudXR SDK documentation](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/index.html).
 
-[The NVIDIA CloudXR.js SDK](#) enables developers to build web clients that stream high-quality spatial content from CloudXR servers with powerful GPUs to web browsers on XR devices. It consists of:
+[The NVIDIA CloudXR.js SDK](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/index.html) enables developers to build web clients that stream high-quality spatial content from CloudXR servers with powerful GPUs to web browsers on XR devices. It consists of:
 
 - **CloudXR.js SDK** - a JavaScript client library
 - **WebGL-based simple sample client** that uses core Web APIs (WebGL, WebXR)
@@ -49,25 +49,16 @@ You need both a working client and a working server in order to test. Typically 
 
 <!-- #endregion firstRunGuide -->
 
-Please refer to [the CloudXR.js SDK documentations](#sdk-documentation) for details.
+## Documentation
 
-## SDK Documentation
+Full documentation is available on the [NVIDIA CloudXR SDK documentation site](https://docs.nvidia.com/cloudxr-sdk/latest/), including:
 
-The `docs/` folder contains comprehensive documentation including:
-
-- Getting Started guides with example server applications
-- API reference for building custom clients
-- Common issues and solutions
-
-Open `docs/index.html` in your browser for organized navigation with table of contents.
-
-## Support
-
-For technical support and questions about this early access release:
-
-- Review the troubleshooting sections in the SDK documentation
-- Study the example implementations for integration patterns
-- Contact the NVIDIA CloudXR team for additional assistance
+- [CloudXR.js User Guide](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/index.html) -- Session API, client setup, performance tuning, troubleshooting
+- [Quick Start Guide](https://docs.nvidia.com/cloudxr-sdk/latest/quickstart.html) -- end-to-end guided walkthrough
+- [Simple WebGL Workflow](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/sample_webgl.html)
+- [React Sample Workflow](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/sample_react.html)
+- [WebSocket Proxy Setup](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/proxy_setup.html)
+- [Network Configuration](https://docs.nvidia.com/cloudxr-sdk/latest/requirement/network_setup.html)
 
 ## License
 

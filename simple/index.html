@@ -388,6 +388,19 @@ limitations under the License.
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
+        /* Validation Message Box (resolution errors near Connect button) */
+        .validation-message-box {
+            display: none;
+            color: #c62828;
+            font-size: 0.85rem;
+            margin-top: 4px;
+            margin-bottom: 0;
+        }
+
+        .validation-message-box.show {
+            display: block;
+        }
+
         /* Status Message Box */
         .status-message-box {
             display: none;
@@ -472,6 +485,10 @@ limitations under the License.
     <main>
         <aside>
             <button id="startButton" class="start-button" type="button" aria-label="Connect" disabled>CONNECT</button>
+
+            <div id="validationMessageBox" class="validation-message-box" role="alert" aria-live="polite">
+                <span id="validationMessageText"></span>
+            </div>
 
             <div id="statusMessageBox" class="status-message-box" role="alert" aria-live="polite">
                 <span class="status-icon">⚠</span>
