@@ -34,6 +34,7 @@
  * back to the parent component through callback props.
  */
 
+import { useXRButton } from '@helpers/react/useXRButton';
 import { useFrame } from '@react-three/fiber';
 import { Handle, HandleTarget } from '@react-three/handle';
 import { Container, Text, Image } from '@react-three/uikit';
@@ -75,6 +76,7 @@ export default function CloudXR3DUI({
 }: CloudXRUIProps) {
   const groupRef = useRef<Group>(null);
   const handleRef = useRef<Mesh>(null);
+  const xrButton = useXRButton();
 
   useEffect(() => {
     if (groupRef.current) {
@@ -188,7 +190,7 @@ export default function CloudXR3DUI({
               {/* Action buttons row */}
               <Container flexDirection="row" gap={60} justifyContent="center">
                 <Button
-                  onClick={onAction1}
+                  {...xrButton('action1', onAction1)}
                   variant="default"
                   width={480}
                   height={120}
@@ -206,7 +208,7 @@ export default function CloudXR3DUI({
                 </Button>
 
                 <Button
-                  onClick={onAction2}
+                  {...xrButton('action2', onAction2)}
                   variant="default"
                   width={480}
                   height={120}
@@ -227,7 +229,7 @@ export default function CloudXR3DUI({
               {/* Bottom Row */}
               <Container flexDirection="row" justifyContent="center">
                 <Button
-                  onClick={onDisconnect}
+                  {...xrButton('disconnect', onDisconnect)}
                   variant="destructive"
                   width={330}
                   height={105}
