@@ -63,5 +63,3 @@ Full documentation is available on the [NVIDIA CloudXR SDK documentation site](h
 ## License
 
 This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
-
-> **Note**: This is an early access release of CloudXR.js. Features and APIs may change in future releases.
