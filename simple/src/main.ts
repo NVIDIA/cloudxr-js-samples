@@ -43,12 +43,15 @@ import { kPerformanceOptions } from '@helpers/PerformanceProfiles';
 import {
   enableLocalStorage,
   getConnectionConfig,
+  getGridFromInputs,
   getResolutionFromInputs,
   setupCertificateAcceptanceLink,
 } from '@helpers/utils';
 import { getOrCreateCanvas, logOrThrow } from '@helpers/WebGlUtils';
 import {
   createSession,
+  getGridValidationError,
+  getGridValidationMessageForConnect,
   getResolutionValidationError,
   getResolutionValidationMessageForConnect,
   type Session,
@@ -56,6 +59,7 @@ import {
   type SessionOptions,
   type StreamingError,
   SessionState,
+  validateDepthReprojectionGrid,
   validatePerEyeResolution,
 } from '@nvidia/cloudxr';
 
@@ -82,8 +86,12 @@ class CloudXRClient {
   private statusMessageText: HTMLElement;
   private perEyeWidthInput: HTMLInputElement;
   private perEyeHeightInput: HTMLInputElement;
+  private reprojectionGridColsInput: HTMLInputElement;
+  private reprojectionGridRowsInput: HTMLInputElement;
   private resolutionWidthValidationMessage: HTMLElement | null;
   private resolutionHeightValidationMessage: HTMLElement | null;
+  private reprojectionGridColsValidationMessage: HTMLElement | null;
+  private reprojectionGridRowsValidationMessage: HTMLElement | null;
   private validationMessageBox: HTMLElement;
   private validationMessageText: HTMLElement;
   private capabilitiesValid = false;
@@ -98,6 +106,8 @@ class CloudXRClient {
   private posePredictionFactorValue: HTMLElement;
   private enableTexSubImage2DSelect: HTMLSelectElement;
   private useQuestColorWorkaroundSelect: HTMLSelectElement;
+  private xrWebGLLayerAlphaSelect: HTMLSelectElement;
+  private xrWebGLLayerDepthSelect: HTMLSelectElement;
   private deviceProfileSelect: HTMLSelectElement;
   private deviceProfileWarning: HTMLElement;
   private mediaAddressInput: HTMLInputElement;
@@ -167,11 +177,23 @@ class CloudXRClient {
     this.validationMessageText = document.getElementById('validationMessageText') as HTMLElement;
     this.perEyeWidthInput = document.getElementById('perEyeWidth') as HTMLInputElement;
     this.perEyeHeightInput = document.getElementById('perEyeHeight') as HTMLInputElement;
+    this.reprojectionGridColsInput = document.getElementById(
+      'reprojectionGridCols'
+    ) as HTMLInputElement;
+    this.reprojectionGridRowsInput = document.getElementById(
+      'reprojectionGridRows'
+    ) as HTMLInputElement;
     this.resolutionWidthValidationMessage = document.getElementById(
       'resolutionWidthValidationMessage'
     );
     this.resolutionHeightValidationMessage = document.getElementById(
       'resolutionHeightValidationMessage'
+    );
+    this.reprojectionGridColsValidationMessage = document.getElementById(
+      'reprojectionGridColsValidationMessage'
+    );
+    this.reprojectionGridRowsValidationMessage = document.getElementById(
+      'reprojectionGridRowsValidationMessage'
     );
     this.referenceSpaceSelect = document.getElementById('referenceSpace') as HTMLSelectElement;
     this.xrOffsetXInput = document.getElementById('xrOffsetX') as HTMLInputElement;
@@ -194,6 +216,12 @@ class CloudXRClient {
     this.useQuestColorWorkaroundSelect = document.getElementById(
       'useQuestColorWorkaround'
     ) as HTMLSelectElement;
+    this.xrWebGLLayerAlphaSelect = document.getElementById(
+      'xrWebGLLayerAlpha'
+    ) as HTMLSelectElement;
+    this.xrWebGLLayerDepthSelect = document.getElementById(
+      'xrWebGLLayerDepth'
+    ) as HTMLSelectElement;
     this.deviceProfileSelect = document.getElementById('deviceProfile') as HTMLSelectElement;
     this.deviceProfileWarning = document.getElementById('deviceProfileWarning') as HTMLElement;
     this.mediaAddressInput = document.getElementById('mediaAddress') as HTMLInputElement;
@@ -209,6 +237,8 @@ class CloudXRClient {
     enableLocalStorage(this.maxStreamingBitrateMbpsSelect, 'maxStreamingBitrateMbps');
     enableLocalStorage(this.perEyeWidthInput, 'perEyeWidth');
     enableLocalStorage(this.perEyeHeightInput, 'perEyeHeight');
+    enableLocalStorage(this.reprojectionGridColsInput, 'reprojectionGridCols');
+    enableLocalStorage(this.reprojectionGridRowsInput, 'reprojectionGridRows');
     enableLocalStorage(this.referenceSpaceSelect, 'referenceSpace');
     enableLocalStorage(this.xrOffsetXInput, 'xrOffsetX');
     enableLocalStorage(this.xrOffsetYInput, 'xrOffsetY');
@@ -217,6 +247,8 @@ class CloudXRClient {
     enableLocalStorage(this.posePredictionFactorInput, 'posePredictionFactor');
     enableLocalStorage(this.enableTexSubImage2DSelect, 'enableTexSubImage2D');
     enableLocalStorage(this.useQuestColorWorkaroundSelect, 'useQuestColorWorkaround');
+    enableLocalStorage(this.xrWebGLLayerAlphaSelect, 'xrWebGLLayerAlpha');
+    enableLocalStorage(this.xrWebGLLayerDepthSelect, 'xrWebGLLayerDepth');
     enableLocalStorage(this.deviceProfileSelect, 'deviceProfile');
     enableLocalStorage(this.mediaAddressInput, 'mediaAddress');
     enableLocalStorage(this.mediaPortInput, 'mediaPort');
@@ -240,7 +272,12 @@ class CloudXRClient {
     this.setProfileToCustomOnProfileLinkedChange(this.perEyeWidthInput, 'change');
     this.setProfileToCustomOnProfileLinkedChange(this.perEyeHeightInput, 'input');
     this.setProfileToCustomOnProfileLinkedChange(this.perEyeHeightInput, 'change');
+    this.setProfileToCustomOnProfileLinkedChange(this.reprojectionGridColsInput, 'input');
+    this.setProfileToCustomOnProfileLinkedChange(this.reprojectionGridColsInput, 'change');
+    this.setProfileToCustomOnProfileLinkedChange(this.reprojectionGridRowsInput, 'input');
+    this.setProfileToCustomOnProfileLinkedChange(this.reprojectionGridRowsInput, 'change');
     this.updateResolutionValidationMessage();
+    this.updateGridValidationMessage();
     const updateResValidation = () => this.updateResolutionValidationMessage();
     this.perEyeWidthInput.addEventListener('input', updateResValidation);
     this.perEyeWidthInput.addEventListener('change', updateResValidation);
@@ -250,6 +287,15 @@ class CloudXRClient {
     this.perEyeHeightInput.addEventListener('change', updateResValidation);
     this.perEyeHeightInput.addEventListener('blur', updateResValidation);
     this.perEyeHeightInput.addEventListener('keyup', updateResValidation);
+    const updateGridValidation = () => this.updateGridValidationMessage();
+    this.reprojectionGridColsInput.addEventListener('input', updateGridValidation);
+    this.reprojectionGridColsInput.addEventListener('change', updateGridValidation);
+    this.reprojectionGridColsInput.addEventListener('blur', updateGridValidation);
+    this.reprojectionGridColsInput.addEventListener('keyup', updateGridValidation);
+    this.reprojectionGridRowsInput.addEventListener('input', updateGridValidation);
+    this.reprojectionGridRowsInput.addEventListener('change', updateGridValidation);
+    this.reprojectionGridRowsInput.addEventListener('blur', updateGridValidation);
+    this.reprojectionGridRowsInput.addEventListener('keyup', updateGridValidation);
     this.setProfileToCustomOnProfileLinkedChange(this.deviceFrameRateSelect, 'change');
     this.setProfileToCustomOnProfileLinkedChange(this.maxStreamingBitrateMbpsSelect, 'change');
     this.setProfileToCustomOnProfileLinkedChange(this.codecSelect, 'change');
@@ -258,6 +304,8 @@ class CloudXRClient {
     this.setProfileToCustomOnProfileLinkedChange(this.posePredictionFactorInput, 'input');
     this.setProfileToCustomOnProfileLinkedChange(this.enableTexSubImage2DSelect, 'change');
     this.setProfileToCustomOnProfileLinkedChange(this.useQuestColorWorkaroundSelect, 'change');
+    this.setProfileToCustomOnProfileLinkedChange(this.xrWebGLLayerAlphaSelect, 'change');
+    this.setProfileToCustomOnProfileLinkedChange(this.xrWebGLLayerDepthSelect, 'change');
 
     // Configure proxy information and port placeholder based on protocol
     if (window.location.protocol === 'https:') {
@@ -355,19 +403,56 @@ class CloudXRClient {
     this.updateConnectButtonState();
   }
 
+  /** Update inline grid validation messages under each input. */
+  private updateGridValidationMessage(): void {
+    const { reprojectionGridCols, reprojectionGridRows } = getGridFromInputs(
+      this.reprojectionGridColsInput,
+      this.reprojectionGridRowsInput
+    );
+    const { reprojectionGridColsError, reprojectionGridRowsError } = validateDepthReprojectionGrid(
+      reprojectionGridCols,
+      reprojectionGridRows
+    );
+    if (this.reprojectionGridColsValidationMessage) {
+      const showGridCols = reprojectionGridColsError ?? '';
+      this.reprojectionGridColsValidationMessage.textContent = showGridCols;
+      this.reprojectionGridColsValidationMessage.className = showGridCols
+        ? 'config-text resolution-validation-error'
+        : 'config-text';
+    }
+    if (this.reprojectionGridRowsValidationMessage) {
+      const showGridRows = reprojectionGridRowsError ?? '';
+      this.reprojectionGridRowsValidationMessage.textContent = showGridRows;
+      this.reprojectionGridRowsValidationMessage.className = showGridRows
+        ? 'config-text resolution-validation-error'
+        : 'config-text';
+    }
+    this.updateConnectButtonState();
+  }
+
   /** Disable Connect button when resolution invalid; show validation in its own box. */
   private updateConnectButtonState(): void {
     const { w, h } = getResolutionFromInputs(this.perEyeWidthInput, this.perEyeHeightInput);
+    const { reprojectionGridCols, reprojectionGridRows } = getGridFromInputs(
+      this.reprojectionGridColsInput,
+      this.reprojectionGridRowsInput
+    );
     const resolutionError = getResolutionValidationError(w, h);
+    const gridError = getGridValidationError(reprojectionGridCols, reprojectionGridRows);
     const connectMessage = getResolutionValidationMessageForConnect(w, h);
-    if (connectMessage) {
-      this.validationMessageText.textContent = connectMessage;
+    const gridConnectMessage = getGridValidationMessageForConnect(
+      reprojectionGridCols,
+      reprojectionGridRows
+    );
+    const combinedConnectMessage = [connectMessage, gridConnectMessage].filter(Boolean).join(' ');
+    if (combinedConnectMessage) {
+      this.validationMessageText.textContent = combinedConnectMessage;
       this.validationMessageBox.className = 'validation-message-box show';
     } else {
       this.validationMessageText.textContent = '';
       this.validationMessageBox.className = 'validation-message-box';
     }
-    const shouldEnable = this.capabilitiesValid && !resolutionError;
+    const shouldEnable = this.capabilitiesValid && !resolutionError && !gridError;
     this.startButton.disabled = !shouldEnable;
     if (shouldEnable) {
       this.startButton.innerHTML = 'CONNECT';
@@ -398,12 +483,26 @@ class CloudXRClient {
       this.perEyeWidthInput,
       this.perEyeHeightInput
     );
+    const { reprojectionGridCols, reprojectionGridRows } = getGridFromInputs(
+      this.reprojectionGridColsInput,
+      this.reprojectionGridRowsInput
+    );
 
     // Validate resolution before starting XR so we never enter VR with invalid config
     const resolutionError = getResolutionValidationError(perEyeWidth, perEyeHeight);
-    if (resolutionError) {
+    const gridError = getGridValidationError(reprojectionGridCols, reprojectionGridRows);
+    if (resolutionError || gridError) {
       const connectMessage = getResolutionValidationMessageForConnect(perEyeWidth, perEyeHeight);
-      this.showStatus(connectMessage ?? resolutionError, 'error');
+      const gridConnectMessage = getGridValidationMessageForConnect(
+        reprojectionGridCols,
+        reprojectionGridRows
+      );
+      this.showStatus(
+        [connectMessage ?? resolutionError, gridConnectMessage ?? gridError]
+          .filter(Boolean)
+          .join(' '),
+        'error'
+      );
       return;
     }
 
@@ -440,6 +539,8 @@ class CloudXRClient {
         proxyUrl,
         perEyeWidth,
         perEyeHeight,
+        reprojectionGridCols,
+        reprojectionGridRows,
         maxStreamingBitrateKbps,
         referenceSpace
       );
@@ -523,10 +624,12 @@ class CloudXRClient {
     const xrWebGLLayerScale =
       this.deviceProfile.web?.framebufferScaleFactor ??
       kPerformanceOptions.xrWebGLLayer_framebufferScaleFactor;
+    const xrWebGLLayerAlpha = this.getXrWebGLLayerAlpha();
+    const xrWebGLLayerDepth = this.getXrWebGLLayerDepth();
     this.baseLayer = new XRWebGLLayer(this.xrSession, this.gl!, {
-      alpha: true,
+      alpha: xrWebGLLayerAlpha,
       antialias: xrWebGLLayerAntialias,
-      depth: true,
+      depth: xrWebGLLayerDepth,
       framebufferScaleFactor: xrWebGLLayerScale,
       ignoreDepthValues: false,
       stencil: false,
@@ -593,6 +696,8 @@ class CloudXRClient {
     proxyUrl: string,
     perEyeWidth: number,
     perEyeHeight: number,
+    reprojectionGridCols: number | undefined,
+    reprojectionGridRows: number | undefined,
     maxStreamingBitrateKbps: number,
     referenceSpace: XRReferenceSpace
   ): Promise<void> {
@@ -612,6 +717,8 @@ class CloudXRClient {
       codec: this.codecSelect.value as 'h264' | 'h265' | 'av1',
       perEyeWidth, // Stream resolution: width = perEyeWidth * 2 (side-by-side)
       perEyeHeight, // Stream resolution: height = perEyeHeight * 9/4 (includes metadata)
+      reprojectionGridCols,
+      reprojectionGridRows,
       referenceSpace,
       deviceFrameRate: parseInt(this.deviceFrameRateSelect.value, 10),
       maxStreamingBitrateKbps,
@@ -766,6 +873,20 @@ class CloudXRClient {
     return this.deviceProfile.web?.powerPreference ?? 'high-performance';
   }
 
+  private getXrWebGLLayerAlpha(): boolean {
+    const uiValue = this.xrWebGLLayerAlphaSelect.value;
+    if (uiValue === 'true') return true;
+    if (uiValue === 'false') return false;
+    return this.deviceProfile.web?.alpha ?? true;
+  }
+
+  private getXrWebGLLayerDepth(): boolean {
+    const uiValue = this.xrWebGLLayerDepthSelect.value;
+    if (uiValue === 'true') return true;
+    if (uiValue === 'false') return false;
+    return this.deviceProfile.web?.depth ?? true;
+  }
+
   private setProfileToCustomIfNeeded(): void {
     if (this.deviceProfileSelect.value === 'custom') return;
     this.deviceProfileSelect.value = 'custom';
@@ -817,6 +938,10 @@ class CloudXRClient {
     if (cloudxr.perEyeHeight !== undefined) {
       this.perEyeHeightInput.value = String(cloudxr.perEyeHeight);
     }
+    this.reprojectionGridColsInput.value =
+      cloudxr.reprojectionGridCols !== undefined ? String(cloudxr.reprojectionGridCols) : '';
+    this.reprojectionGridRowsInput.value =
+      cloudxr.reprojectionGridRows !== undefined ? String(cloudxr.reprojectionGridRows) : '';
     if (cloudxr.deviceFrameRate !== undefined) {
       this.setSelectValueIfAvailable(this.deviceFrameRateSelect, String(cloudxr.deviceFrameRate));
     }
@@ -840,12 +965,20 @@ class CloudXRClient {
     if (cloudxr.enableTexSubImage2D !== undefined) {
       this.enableTexSubImage2DSelect.value = String(cloudxr.enableTexSubImage2D);
     }
+    if (profile.web?.alpha !== undefined) {
+      this.xrWebGLLayerAlphaSelect.value = String(profile.web.alpha);
+    }
+    if (profile.web?.depth !== undefined) {
+      this.xrWebGLLayerDepthSelect.value = String(profile.web.depth);
+    }
   }
 
   private persistProfileFieldsToLocalStorage(): void {
     try {
       localStorage.setItem('perEyeWidth', this.perEyeWidthInput.value);
       localStorage.setItem('perEyeHeight', this.perEyeHeightInput.value);
+      localStorage.setItem('reprojectionGridCols', this.reprojectionGridColsInput.value);
+      localStorage.setItem('reprojectionGridRows', this.reprojectionGridRowsInput.value);
       localStorage.setItem('deviceFrameRate', this.deviceFrameRateSelect.value);
       localStorage.setItem('maxStreamingBitrateMbps', this.maxStreamingBitrateMbpsSelect.value);
       localStorage.setItem('codec', this.codecSelect.value);
@@ -853,6 +986,8 @@ class CloudXRClient {
       localStorage.setItem('posePredictionFactor', this.posePredictionFactorInput.value);
       localStorage.setItem('enableTexSubImage2D', this.enableTexSubImage2DSelect.value);
       localStorage.setItem('useQuestColorWorkaround', this.useQuestColorWorkaroundSelect.value);
+      localStorage.setItem('xrWebGLLayerAlpha', this.xrWebGLLayerAlphaSelect.value);
+      localStorage.setItem('xrWebGLLayerDepth', this.xrWebGLLayerDepthSelect.value);
     } catch (e) {
       console.warn('Failed to persist profile fields to localStorage:', e);
     }
