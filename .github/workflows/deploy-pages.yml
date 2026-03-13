@@ -62,7 +62,7 @@ jobs:
 
       - name: Set SDK version
         id: sdk_version
-        run: echo "version=6.1.0-rc7" >> "$GITHUB_OUTPUT"
+        run: echo "version=6.1.0" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node
         uses: actions/setup-node@v4
