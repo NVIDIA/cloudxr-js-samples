@@ -34,7 +34,9 @@
  * back to the parent component through callback props.
  */
 
+import { PerformanceCanvasImage } from '@helpers/react/PerformanceCanvasImage';
 import { useXRButton } from '@helpers/react/useXRButton';
+import { ReadonlySignal } from '@preact/signals-react';
 import { useFrame } from '@react-three/fiber';
 import { Handle, HandleTarget } from '@react-three/handle';
 import { Container, Text, Image } from '@react-three/uikit';
@@ -45,12 +47,18 @@ import { damp } from 'three/src/math/MathUtils.js';
 
 const FACE_CAMERA_DAMPING = 10;
 
+const METRIC_SLOT_WIDTH = 512;
+const METRIC_SLOT_HEIGHT = 250;
+
 interface CloudXRUIProps {
   onAction1?: () => void;
   onAction2?: () => void;
   onDisconnect?: () => void;
   serverAddress?: string;
   sessionStatus?: string;
+  renderFpsText?: ReadonlySignal<string>;
+  streamingFpsText?: ReadonlySignal<string>;
+  poseToRenderText?: ReadonlySignal<string>;
   position?: [number, number, number];
   rotation?: [number, number, number];
 }
@@ -71,6 +79,9 @@ export default function CloudXR3DUI({
   onDisconnect,
   serverAddress = '127.0.0.1',
   sessionStatus = 'Disconnected',
+  renderFpsText,
+  streamingFpsText,
+  poseToRenderText,
   position = [1.8, 1.75, -1.3],
   rotation = [0, -0.3, 0],
 }: CloudXRUIProps) {
@@ -155,99 +166,153 @@ export default function CloudXR3DUI({
           sizeY={2.475}
         >
           <Container
-            width={1600}
-            height={900}
+            width={1900}
+            height={980}
             backgroundColor="rgba(40, 40, 40, 0.85)"
             borderRadius={20}
-            padding={60}
-            paddingBottom={80}
+            padding={50}
+            paddingLeft={50}
+            paddingRight={50}
             alignItems="center"
             justifyContent="center"
-            flexDirection="column"
+            flexDirection="row"
             gap={36}
           >
-            {/* Title */}
-            <Text fontSize={96} fontWeight="bold" color="white" textAlign="center">
-              Controls
-            </Text>
-
-            {/* Server Info */}
-            <Text fontSize={48} color="white" textAlign="center" marginBottom={24}>
-              Server address: {serverAddress}
-            </Text>
-            <Text fontSize={48} color="white" textAlign="center" marginBottom={48}>
-              Session status: {sessionStatus}
-            </Text>
-
-            {/* Button Grid */}
+            {/* Left Column - Performance Metrics (canvas texture) */}
             <Container
+              width={520}
               flexDirection="column"
-              gap={60}
+              gap={24}
               alignItems="center"
               justifyContent="center"
-              width="100%"
             >
-              {/* Action buttons row */}
-              <Container flexDirection="row" gap={60} justifyContent="center">
-                <Button
-                  {...xrButton('action1', onAction1)}
-                  variant="default"
-                  width={480}
-                  height={120}
-                  borderRadius={40}
-                  backgroundColor="rgba(220, 220, 220, 0.9)"
-                  hover={{
-                    backgroundColor: 'rgba(100, 150, 255, 1)',
-                    borderColor: 'white',
-                    borderWidth: 2,
-                  }}
+              <Container
+                width="100%"
+                flexDirection="column"
+                gap={20}
+                alignItems="center"
+                justifyContent="center"
+                backgroundColor="rgba(20, 20, 20, 0.6)"
+                borderRadius={20}
+                padding={36}
+              >
+                <Text
+                  fontSize={52}
+                  fontWeight="bold"
+                  color="white"
+                  textAlign="center"
+                  marginBottom={4}
                 >
-                  <Text fontSize={48} color="black" fontWeight="medium">
-                    Action 1
-                  </Text>
-                </Button>
-
-                <Button
-                  {...xrButton('action2', onAction2)}
-                  variant="default"
-                  width={480}
-                  height={120}
-                  borderRadius={40}
-                  backgroundColor="rgba(220, 220, 220, 0.9)"
-                  hover={{
-                    backgroundColor: 'rgba(100, 150, 255, 1)',
-                    borderColor: 'white',
-                    borderWidth: 2,
-                  }}
+                  Performance
+                </Text>
+                <Container
+                  width={METRIC_SLOT_WIDTH}
+                  height={METRIC_SLOT_HEIGHT}
+                  alignItems="center"
+                  justifyContent="center"
                 >
-                  <Text fontSize={48} color="black" fontWeight="medium">
-                    Action 2
-                  </Text>
-                </Button>
+                  <PerformanceCanvasImage
+                    width={METRIC_SLOT_WIDTH}
+                    height={METRIC_SLOT_HEIGHT}
+                    renderFpsText={renderFpsText}
+                    streamingFpsText={streamingFpsText}
+                    poseToRenderText={poseToRenderText}
+                  />
+                </Container>
               </Container>
+            </Container>
 
-              {/* Bottom Row */}
-              <Container flexDirection="row" justifyContent="center">
-                <Button
-                  {...xrButton('disconnect', onDisconnect)}
-                  variant="destructive"
-                  width={330}
-                  height={105}
-                  borderRadius={35}
-                  backgroundColor="rgba(255, 150, 150, 0.9)"
-                  hover={{
-                    backgroundColor: 'rgba(255, 50, 50, 1)',
-                    borderColor: 'white',
-                    borderWidth: 2,
-                  }}
-                >
-                  <Container flexDirection="row" alignItems="center" gap={12}>
-                    <Image src="./arrow-left-start-on-rectangle.svg" width={60} height={60} />
-                    <Text fontSize={40} color="black" fontWeight="medium">
-                      Disconnect
+            {/* Right Column - Controls */}
+            <Container
+              flexGrow={1}
+              flexDirection="column"
+              gap={20}
+              alignItems="center"
+              justifyContent="center"
+            >
+              {/* Title */}
+              <Text fontSize={96} fontWeight="bold" color="white" textAlign="center">
+                Controls
+              </Text>
+
+              {/* Server Info */}
+              <Text fontSize={48} color="white" textAlign="center" marginBottom={24}>
+                Server address: {serverAddress}
+              </Text>
+              <Text fontSize={48} color="white" textAlign="center" marginBottom={48}>
+                Session status: {sessionStatus}
+              </Text>
+
+              {/* Button Grid */}
+              <Container
+                flexDirection="column"
+                gap={60}
+                alignItems="center"
+                justifyContent="center"
+                width="100%"
+              >
+                {/* Action buttons row */}
+                <Container flexDirection="row" gap={60} justifyContent="center">
+                  <Button
+                    {...xrButton('action1', onAction1)}
+                    variant="default"
+                    width={480}
+                    height={120}
+                    borderRadius={40}
+                    backgroundColor="rgba(220, 220, 220, 0.9)"
+                    hover={{
+                      backgroundColor: 'rgba(100, 150, 255, 1)',
+                      borderColor: 'white',
+                      borderWidth: 2,
+                    }}
+                  >
+                    <Text fontSize={48} color="black" fontWeight="medium">
+                      Action 1
                     </Text>
-                  </Container>
-                </Button>
+                  </Button>
+
+                  <Button
+                    {...xrButton('action2', onAction2)}
+                    variant="default"
+                    width={480}
+                    height={120}
+                    borderRadius={40}
+                    backgroundColor="rgba(220, 220, 220, 0.9)"
+                    hover={{
+                      backgroundColor: 'rgba(100, 150, 255, 1)',
+                      borderColor: 'white',
+                      borderWidth: 2,
+                    }}
+                  >
+                    <Text fontSize={48} color="black" fontWeight="medium">
+                      Action 2
+                    </Text>
+                  </Button>
+                </Container>
+
+                {/* Bottom Row */}
+                <Container flexDirection="row" justifyContent="center">
+                  <Button
+                    {...xrButton('disconnect', onDisconnect)}
+                    variant="destructive"
+                    width={330}
+                    height={105}
+                    borderRadius={35}
+                    backgroundColor="rgba(255, 150, 150, 0.9)"
+                    hover={{
+                      backgroundColor: 'rgba(255, 50, 50, 1)',
+                      borderColor: 'white',
+                      borderWidth: 2,
+                    }}
+                  >
+                    <Container flexDirection="row" alignItems="center" gap={12}>
+                      <Image src="./arrow-left-start-on-rectangle.svg" width={60} height={60} />
+                      <Text fontSize={40} color="black" fontWeight="medium">
+                        Disconnect
+                      </Text>
+                    </Container>
+                  </Button>
+                </Container>
               </Container>
             </Container>
           </Container>

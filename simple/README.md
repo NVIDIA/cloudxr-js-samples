@@ -75,13 +75,11 @@ docker stop cloudxr-js-sample && docker rm cloudxr-js-sample
 ### Basic Usage
 
 1. **Configure Connection**
-
    - Enter CloudXR server IP address (default: localhost)
    - Set port (default: 49100)
    - Select AR or VR mode
 
 2. **Adjust Settings (Optional)**
-
    - Per-eye resolution (must be multiples of 16)
    - Target frame rate (72, 90, or 120 FPS)
    - Streaming bitrate

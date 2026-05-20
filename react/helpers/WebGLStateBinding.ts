@@ -172,6 +172,7 @@ export function bindGL(gl: WebGL2RenderingContext): BoundWebGLState {
     if (!originalMethod) {
       throw new Error('Original method not found for ' + name);
     }
+    /* istanbul ignore next -- defensive guard is unreachable through bindGL's local call path. */
     if (originalMethod === wrappedFunctions.get(name)) {
       throw new Error('Wrapped function already bound for ' + name);
     }

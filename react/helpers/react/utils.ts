@@ -24,6 +24,10 @@ export type ControlPanelPosition = 'left' | 'center' | 'right';
 /** React UI options (e.g. in-XR control panel position). */
 export interface ReactUIConfig {
   controlPanelPosition?: ControlPanelPosition;
+  /**
+   * When true, all WebGL rendering is skipped.
+   */
+  headless?: boolean;
 }
 
 const CONTROL_PANEL_POSITIONS: readonly ControlPanelPosition[] = ['left', 'center', 'right'];
