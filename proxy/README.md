@@ -7,7 +7,7 @@ For comprehensive proxy setup guidance including Kubernetes deployments and cert
 ## What It Does
 
 - Provides WSS (WebSocket Secure) endpoint (default port `48322`)
-- Automatically generates self-signed SSL certificates on startup
+- Automatically generates self-signed SSL certificates on startup (with `subjectAltName` for `localhost`, `127.0.0.1`, `::1`, and any names you list in `CERT_HOSTNAMES`)
 - Forwards traffic to CloudXR Runtime (default `localhost:49100`)
 - Configurable backend, proxy ports, and health checks
 - CORS support for browser-based XR applications
@@ -49,14 +49,15 @@ docker rm wss-proxy
 
 ### Environment Variables
 
-| Variable                | Default     | Description                                      |
-| ----------------------- | ----------- | ------------------------------------------------ |
-| `BACKEND_HOST`          | `localhost` | CloudXR Runtime hostname or IP address           |
-| `BACKEND_PORT`          | `49100`     | CloudXR Runtime WebSocket port                   |
-| `PROXY_PORT`            | `48322`     | SSL proxy listening port                         |
-| `HEALTH_CHECK_INTERVAL` | `2s`        | Time between backend health checks               |
-| `HEALTH_CHECK_RISE`     | `2`         | Consecutive successful checks to mark backend UP |
-| `HEALTH_CHECK_FALL`     | `3`         | Consecutive failed checks to mark backend DOWN   |
+| Variable                | Default     | Description                                                                                                                                                                                                                            |
+| ----------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `BACKEND_HOST`          | `localhost` | CloudXR Runtime hostname or IP address                                                                                                                                                                                                 |
+| `BACKEND_PORT`          | `49100`     | CloudXR Runtime WebSocket port                                                                                                                                                                                                         |
+| `PROXY_PORT`            | `48322`     | SSL proxy listening port                                                                                                                                                                                                               |
+| `CERT_HOSTNAMES`        | _(empty)_   | Extra `subjectAltName` entries for the auto-generated cert (comma-separated DNS names / IPv4 / IPv6). Required if you reach the proxy by any name other than `localhost` / `127.0.0.1` / `::1`. Example: `192.168.1.42,xr-host.local`. |
+| `HEALTH_CHECK_INTERVAL` | `2s`        | Time between backend health checks                                                                                                                                                                                                     |
+| `HEALTH_CHECK_RISE`     | `2`         | Consecutive successful checks to mark backend UP                                                                                                                                                                                       |
+| `HEALTH_CHECK_FALL`     | `3`         | Consecutive failed checks to mark backend DOWN                                                                                                                                                                                         |
 
 ## SSL Certificates
 
@@ -124,6 +125,16 @@ If you have your own SSL certificate, you can use it instead of the auto-generat
 ### For XR Headsets
 
 You need to trust the certificate on your XR headset browser. See [Client Setup](https://docs.nvidia.com/cloudxr-sdk/latest/usr_guide/cloudxr_js/client_setup.html) for device-specific instructions.
+
+If the headset connects to the proxy by IP address or by a hostname other than `localhost`, set `CERT_HOSTNAMES` accordingly **before first run** (or delete the existing cert volume to regenerate). Without a matching `subjectAltName`, every browser shipped after 2017 will reject the cert with `ERR_CERT_COMMON_NAME_INVALID`.
+
+```bash
+docker run -d --name wss-proxy \
+  --network host \
+  -e CERT_HOSTNAMES="192.168.1.42,xr-host.local" \
+  -v cloudxr-proxy-certs:/usr/local/etc/haproxy/certs \
+  cloudxr-wss-proxy
+```
 
 ## Architecture
 

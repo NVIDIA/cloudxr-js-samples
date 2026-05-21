@@ -46,6 +46,8 @@ import {
   getGridFromInputs,
   getResolutionFromInputs,
   setupCertificateAcceptanceLink,
+  type CertLinkController,
+  type CertStatusInfo,
 } from '@helpers/utils';
 import { getOrCreateCanvas, logOrThrow } from '@helpers/WebGlUtils';
 import {
@@ -62,6 +64,7 @@ import {
   validateDepthReprojectionGrid,
   validatePerEyeResolution,
 } from '@nvidia/cloudxr';
+import type { XRDevice } from 'iwer';
 
 // Override PressureObserver early to catch errors from buggy browser implementations
 overridePressureObserver();
@@ -95,6 +98,8 @@ class CloudXRClient {
   private validationMessageBox: HTMLElement;
   private validationMessageText: HTMLElement;
   private capabilitiesValid = false;
+  private certStatus: CertStatusInfo = { accepted: true, required: false, verified: true };
+  private certLinkController: CertLinkController | null = null;
   private referenceSpaceSelect: HTMLSelectElement;
   private xrOffsetXInput: HTMLInputElement;
   private xrOffsetYInput: HTMLInputElement;
@@ -108,6 +113,8 @@ class CloudXRClient {
   private useQuestColorWorkaroundSelect: HTMLSelectElement;
   private xrWebGLLayerAlphaSelect: HTMLSelectElement;
   private xrWebGLLayerDepthSelect: HTMLSelectElement;
+  private framebufferScaleFactorInput: HTMLInputElement;
+  private framebufferScaleFactorValue: HTMLElement;
   private deviceProfileSelect: HTMLSelectElement;
   private deviceProfileWarning: HTMLElement;
   private mediaAddressInput: HTMLInputElement;
@@ -120,6 +127,7 @@ class CloudXRClient {
   // Core Session Components
   private xrSession: XRSession | null = null; // WebXR session (hardware access)
   private cloudxrSession: Session | null = null; // CloudXR session (streaming)
+
   private gl: WebGL2RenderingContext | null = null; // WebGL context (rendering)
   private baseLayer: XRWebGLLayer | null = null; // Bridge between WebXR and WebGL
   private deviceFrameRate: number = 0; // Target frame rate for XR session
@@ -222,6 +230,12 @@ class CloudXRClient {
     this.xrWebGLLayerDepthSelect = document.getElementById(
       'xrWebGLLayerDepth'
     ) as HTMLSelectElement;
+    this.framebufferScaleFactorInput = document.getElementById(
+      'framebufferScaleFactor'
+    ) as HTMLInputElement;
+    this.framebufferScaleFactorValue = document.getElementById(
+      'framebufferScaleFactorValue'
+    ) as HTMLElement;
     this.deviceProfileSelect = document.getElementById('deviceProfile') as HTMLSelectElement;
     this.deviceProfileWarning = document.getElementById('deviceProfileWarning') as HTMLElement;
     this.mediaAddressInput = document.getElementById('mediaAddress') as HTMLInputElement;
@@ -249,6 +263,7 @@ class CloudXRClient {
     enableLocalStorage(this.useQuestColorWorkaroundSelect, 'useQuestColorWorkaround');
     enableLocalStorage(this.xrWebGLLayerAlphaSelect, 'xrWebGLLayerAlpha');
     enableLocalStorage(this.xrWebGLLayerDepthSelect, 'xrWebGLLayerDepth');
+    enableLocalStorage(this.framebufferScaleFactorInput, 'framebufferScaleFactor');
     enableLocalStorage(this.deviceProfileSelect, 'deviceProfile');
     enableLocalStorage(this.mediaAddressInput, 'mediaAddress');
     enableLocalStorage(this.mediaPortInput, 'mediaPort');
@@ -260,6 +275,11 @@ class CloudXRClient {
     });
     // Set initial display value
     this.posePredictionFactorValue.textContent = this.posePredictionFactorInput.value;
+
+    this.framebufferScaleFactorInput.addEventListener('input', () => {
+      this.framebufferScaleFactorValue.textContent = this.framebufferScaleFactorInput.value;
+    });
+    this.framebufferScaleFactorValue.textContent = this.framebufferScaleFactorInput.value;
 
     // Initialize device profile from restored value (do not overwrite form; form was restored from localStorage)
     this.setDeviceProfile(resolveDeviceProfileId(this.deviceProfileSelect.value), false);
@@ -306,6 +326,8 @@ class CloudXRClient {
     this.setProfileToCustomOnProfileLinkedChange(this.useQuestColorWorkaroundSelect, 'change');
     this.setProfileToCustomOnProfileLinkedChange(this.xrWebGLLayerAlphaSelect, 'change');
     this.setProfileToCustomOnProfileLinkedChange(this.xrWebGLLayerDepthSelect, 'change');
+    this.setProfileToCustomOnProfileLinkedChange(this.framebufferScaleFactorInput, 'change');
+    this.setProfileToCustomOnProfileLinkedChange(this.framebufferScaleFactorInput, 'input');
 
     // Configure proxy information and port placeholder based on protocol
     if (window.location.protocol === 'https:') {
@@ -317,16 +339,45 @@ class CloudXRClient {
       this.portInput.placeholder = 'Port (default: 49100)';
     }
 
-    this.startButton.addEventListener('click', () => this.connectToCloudXR());
+    this.startButton.addEventListener('click', async () => {
+      this.updateConnectButtonState();
+      if (this.certStatus.required && !this.certStatus.accepted && this.certLinkController) {
+        this.startButton.disabled = true;
+        this.startButton.textContent = 'CONNECT (waiting for certificate check...)';
+        let certWaitTimeoutId: ReturnType<typeof setTimeout> | null = null;
+        try {
+          await Promise.race([
+            this.certLinkController.verifyNow(),
+            new Promise<void>(resolve => {
+              certWaitTimeoutId = setTimeout(resolve, 500);
+            }),
+          ]);
+        } finally {
+          if (certWaitTimeoutId !== null) {
+            clearTimeout(certWaitTimeoutId);
+          }
+        }
+        this.startButton.textContent = 'CONNECT';
+        this.updateConnectButtonState();
+      }
+      if (this.startButton.disabled) {
+        return;
+      }
+      await this.connectToCloudXR();
+    });
     this.exitButton.addEventListener('click', () => this.xrSession?.end());
 
     // Set up certificate acceptance link
-    setupCertificateAcceptanceLink(
+    this.certLinkController = setupCertificateAcceptanceLink(
       this.serverIpInput,
       this.portInput,
       this.proxyUrlInput,
       this.certAcceptanceLink,
-      this.certLink
+      this.certLink,
+      (status: CertStatusInfo) => {
+        this.certStatus = status;
+        this.updateConnectButtonState();
+      }
     );
 
     this.checkWebXRSupport();
@@ -362,11 +413,11 @@ class CloudXRClient {
     } else if (iwerLoaded) {
       // Include IWER status in the final success message
       this.showStatus(
-        'CloudXR.js SDK is supported. Ready to connect! -- Using IWER (Immersive Web Emulator Runtime) - Emulating Meta Quest 3.',
+        'CloudXR.js SDK is supported. Using IWER (Immersive Web Emulator Runtime) - Emulating Meta Quest 3.',
         'info'
       );
     } else {
-      this.showStatus('CloudXR.js SDK is supported. Ready to connect!', 'success');
+      this.showStatus('CloudXR.js SDK is supported.', 'success');
     }
 
     this.capabilitiesValid = true;
@@ -444,7 +495,14 @@ class CloudXRClient {
       reprojectionGridCols,
       reprojectionGridRows
     );
-    const combinedConnectMessage = [connectMessage, gridConnectMessage].filter(Boolean).join(' ');
+    const certPending =
+      this.certStatus.required && this.certStatus.verified === true && !this.certStatus.accepted;
+    const certMessage = certPending
+      ? 'Accept the certificate using the link below before connecting.'
+      : '';
+    const combinedConnectMessage = [connectMessage, gridConnectMessage, certMessage]
+      .filter(Boolean)
+      .join('\n');
     if (combinedConnectMessage) {
       this.validationMessageText.textContent = combinedConnectMessage;
       this.validationMessageBox.className = 'validation-message-box show';
@@ -452,7 +510,7 @@ class CloudXRClient {
       this.validationMessageText.textContent = '';
       this.validationMessageBox.className = 'validation-message-box';
     }
-    const shouldEnable = this.capabilitiesValid && !resolutionError && !gridError;
+    const shouldEnable = this.capabilitiesValid && !resolutionError && !gridError && !certPending;
     this.startButton.disabled = !shouldEnable;
     if (shouldEnable) {
       this.startButton.innerHTML = 'CONNECT';
@@ -465,7 +523,7 @@ class CloudXRClient {
    */
   private async connectToCloudXR(): Promise<void> {
     // Read configuration from UI form
-    const serverIp = this.serverIpInput.value.trim() || 'localhost';
+    const serverIp = this.serverIpInput.value.trim() || window.location.hostname || '127.0.0.1';
 
     // Determine default port based on connection type and proxy usage
     const useSecureConnection = window.location.protocol === 'https:';
@@ -621,9 +679,7 @@ class CloudXRClient {
     // Create XRWebGLLayer - provides framebuffer for CloudXR to render into
     const xrWebGLLayerAntialias =
       this.deviceProfile.web?.xrWebGLLayerAntialias ?? kPerformanceOptions.xrWebGLLayer_antialias;
-    const xrWebGLLayerScale =
-      this.deviceProfile.web?.framebufferScaleFactor ??
-      kPerformanceOptions.xrWebGLLayer_framebufferScaleFactor;
+    const xrWebGLLayerScale = this.getFramebufferScaleFactor();
     const xrWebGLLayerAlpha = this.getXrWebGLLayerAlpha();
     const xrWebGLLayerDepth = this.getXrWebGLLayerDepth();
     this.baseLayer = new XRWebGLLayer(this.xrSession, this.gl!, {
@@ -730,7 +786,7 @@ class CloudXRClient {
       mediaPort,
       telemetry: {
         enabled: true,
-        appInfo: { version: '6.1.0', product: 'CloudXR.js WebGL Example' },
+        appInfo: { version: '6.2.0', product: 'CloudXR.js WebGL Example' },
       },
     };
 
@@ -887,6 +943,17 @@ class CloudXRClient {
     return this.deviceProfile.web?.depth ?? true;
   }
 
+  private getFramebufferScaleFactor(): number {
+    const scale = parseFloat(this.framebufferScaleFactorInput.value);
+    if (!Number.isNaN(scale)) {
+      return scale;
+    }
+    return (
+      this.deviceProfile.web?.framebufferScaleFactor ??
+      kPerformanceOptions.xrWebGLLayer_framebufferScaleFactor
+    );
+  }
+
   private setProfileToCustomIfNeeded(): void {
     if (this.deviceProfileSelect.value === 'custom') return;
     this.deviceProfileSelect.value = 'custom';
@@ -971,6 +1038,10 @@ class CloudXRClient {
     if (profile.web?.depth !== undefined) {
       this.xrWebGLLayerDepthSelect.value = String(profile.web.depth);
     }
+    if (profile.web?.framebufferScaleFactor !== undefined) {
+      this.framebufferScaleFactorInput.value = String(profile.web.framebufferScaleFactor);
+      this.framebufferScaleFactorValue.textContent = this.framebufferScaleFactorInput.value;
+    }
   }
 
   private persistProfileFieldsToLocalStorage(): void {
@@ -988,6 +1059,7 @@ class CloudXRClient {
       localStorage.setItem('useQuestColorWorkaround', this.useQuestColorWorkaroundSelect.value);
       localStorage.setItem('xrWebGLLayerAlpha', this.xrWebGLLayerAlphaSelect.value);
       localStorage.setItem('xrWebGLLayerDepth', this.xrWebGLLayerDepthSelect.value);
+      localStorage.setItem('framebufferScaleFactor', this.framebufferScaleFactorInput.value);
     } catch (e) {
       console.warn('Failed to persist profile fields to localStorage:', e);
     }

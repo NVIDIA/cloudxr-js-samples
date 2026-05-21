@@ -58,6 +58,13 @@ import {
 export let CHECK_ERRORS = false;
 
 /**
+ * Test/debug helper to toggle error checks without mutating module namespace exports.
+ */
+export function setCheckErrorsEnabled(enabled: boolean): void {
+  CHECK_ERRORS = enabled;
+}
+
+/**
  * Helper function to check if a property is defined on a state object,
  * handling the case where the state object itself might be undefined
  */

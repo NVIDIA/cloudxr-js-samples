@@ -1,0 +1,81 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# HAProxy config template for the WSS proxy. Rendered at container start by
+# envsubst against BACKEND_HOST/BACKEND_PORT/PROXY_PORT/PROXY_SSL_BIND_OPTIONS/
+# HEALTH_CHECK_* environment variables.
+
+global
+        log stdout    local0 info
+        stats timeout 30s
+        user haproxy
+
+        # Default SSL material locations
+        ca-base /etc/ssl/certs
+        crt-base /etc/ssl/private
+
+        # See: https://ssl-config.mozilla.org/#server=haproxy&server-version=3.2&config=intermediate
+        ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+        ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+        ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
+
+defaults
+        log     global
+        option  httplog
+        option  dontlognull
+        option  logasap
+        timeout connect 5s
+        timeout client  3600s
+        timeout server  3600s
+        # WebSocket tunnel timeout (keep connection alive)
+        timeout tunnel  3600s
+
+frontend websocket_frontend
+        log  global
+        bind *:${PROXY_PORT} ${PROXY_SSL_BIND_OPTIONS}
+        mode http
+
+        # Log connection details
+        capture request header Host len 32
+        capture request header Upgrade len 32
+        capture request header Connection len 32
+
+        # Add CORS headers for all responses
+        http-response set-header Access-Control-Allow-Origin "*"
+        http-response set-header Access-Control-Allow-Headers "*"
+        http-response set-header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        http-response set-header Access-Control-Expose-Headers "*"
+        http-response set-header Access-Control-Max-Age "600"
+        # Chrome's Private Network Access: pages on a public origin
+        # (e.g. https://nvidia.github.io) need the local server to opt in
+        # before they can reach a private IP like 10.x / 192.168.x / etc.
+        http-response set-header Access-Control-Allow-Private-Network "true"
+
+        # CORS preflight: detect via Access-Control-Request-Method (per spec) or
+        # bare OPTIONS (some clients send only the latter).
+        acl is_cors_preflight hdr(Access-Control-Request-Method) -m found
+        http-request return status 200 content-type "text/plain" string "OK" if is_cors_preflight
+        http-request return status 200 content-type "text/plain" string "OK" if METH_OPTIONS
+
+        # Cert-acceptance landing page for plain GETs. Forcing Connection: close
+        # prevents HAProxy from reusing this TCP connection for the *next*
+        # request from the browser, which surfaced as a spurious 501 in the
+        # WebXR client right after the user accepts the cert.
+        acl is_websocket hdr(Upgrade) -i websocket
+        http-request return status 200 content-type "text/html; charset=utf-8" string "<!doctype html><html><head><meta charset=utf-8><style>body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#f5f5f5;color:#222}div{text-align:center}h1{font-weight:600;font-size:1.5rem;margin-bottom:.5rem}p{color:#555;font-size:1rem}</style></head><body><div><h1>Certificate Accepted</h1><p>You can close this tab and return to the web client.</p></div></body></html>" hdr "Connection" "close" unless is_websocket
+
+        default_backend websocket_backend
+
+backend websocket_backend
+        log  global
+        mode http
+
+        # WebSocket support - HAProxy automatically handles Upgrade header
+        # No special configuration needed for WebSocket protocol upgrade
+
+        # Health check configuration:
+        # - inter: time between checks
+        # - rise: successful checks to mark as UP
+        # - fall: failed checks to mark as DOWN
+        # - on-marked-down shutdown-sessions: close existing sessions when backend goes down
+        server local_websocket ${BACKEND_HOST}:${BACKEND_PORT} check inter ${HEALTH_CHECK_INTERVAL} rise ${HEALTH_CHECK_RISE} fall ${HEALTH_CHECK_FALL} on-marked-down shutdown-sessions

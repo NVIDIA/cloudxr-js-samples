@@ -88,13 +88,11 @@ docker stop cloudxr-react-sample && docker rm cloudxr-react-sample
 ### Basic Usage
 
 1. **Configure Connection**
-
    - Enter your CloudXR server IP address
    - Set the port (default: 49100)
    - Select AR or VR immersive mode
 
 2. **Adjust Settings** (Optional)
-
    - Configure per-eye resolution (perEyeWidth and perEyeHeight, must be multiples of 16)
    - Set target frame rate and bitrate
    - Adjust XR reference space

@@ -39,9 +39,11 @@ import CloudXRComponent from '@helpers/react/CloudXRComponent';
 import { SimpleEnvironment } from '@helpers/react/SimpleEnvironment';
 import * as CloudXR from '@nvidia/cloudxr';
 import { getResolutionValidationError } from '@nvidia/cloudxr';
+import { signal, computed } from '@preact/signals-react';
 import { Canvas } from '@react-three/fiber';
 import { setPreferredColorScheme } from '@react-three/uikit';
 import { XR, createXRStore, noEvents, PointerEvents, XROrigin, useXR } from '@react-three/xr';
+import type { XRDevice } from 'iwer';
 import { useState, useMemo, useEffect, useRef } from 'react';
 
 import { CloudXR2DUI } from './CloudXR2DUI';
@@ -52,11 +54,25 @@ overridePressureObserver();
 
 setPreferredColorScheme('dark');
 
+// Performance metrics signals - raw data from CloudXRComponent callbacks.
+const renderMetrics = signal<{ fps: number } | null>(null);
+const streamingMetrics = signal<{ fps: number; latencyMs: number } | null>(null);
+const renderFpsText = computed(() =>
+  renderMetrics.value ? renderMetrics.value.fps.toFixed(1) : '-'
+);
+const streamingFpsText = computed(() =>
+  streamingMetrics.value ? streamingMetrics.value.fps.toFixed(1) : '-'
+);
+const poseToRenderText = computed(() =>
+  streamingMetrics.value ? `${streamingMetrics.value.latencyMs.toFixed(1)}ms` : '-'
+);
+
 function App() {
   // 2D UI management
   const [cloudXR2DUI, setCloudXR2DUI] = useState<CloudXR2DUI | null>(null);
   // IWER loading state
   const [iwerLoaded, setIwerLoaded] = useState(false);
+
   // Capability state management
   const [capabilitiesValid, setCapabilitiesValid] = useState(false);
   const capabilitiesCheckedRef = useRef(false);
@@ -151,11 +167,11 @@ function App() {
       } else if (iwerWasLoaded) {
         // Include IWER status in the final success message
         cloudXR2DUI.showStatus(
-          'CloudXR.js SDK is supported. Ready to connect!\nUsing IWER (Immersive Web Emulator Runtime) - Emulating Meta Quest 3.',
+          'CloudXR.js SDK is supported.\nUsing IWER (Immersive Web Emulator Runtime) - Emulating Meta Quest 3.',
           'info'
         );
       } else {
-        cloudXR2DUI.showStatus('CloudXR.js SDK is supported. Ready to connect!', 'success');
+        cloudXR2DUI.showStatus('CloudXR.js SDK is supported.', 'success');
       }
 
       setCapabilitiesValid(true);
@@ -401,6 +417,13 @@ function App() {
     }
   };
 
+  const handleRenderPerformanceMetrics = (fps: number) => {
+    renderMetrics.value = { fps };
+  };
+  const handleStreamingPerformanceMetrics = (fps: number, latencyMs: number) => {
+    streamingMetrics.value = { fps, latencyMs };
+  };
+
   // Memo config based on configVersion (manual dependency tracker incremented on config changes)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const config = useMemo(
@@ -533,6 +556,8 @@ function App() {
                 }}
                 onSessionReady={setCloudXRSession}
                 onServerAddress={setServerAddress}
+                onRenderPerformanceMetrics={handleRenderPerformanceMetrics}
+                onStreamingPerformanceMetrics={handleStreamingPerformanceMetrics}
               />
               <CloudXR3DUI
                 onAction1={handleAction1}
@@ -540,6 +565,9 @@ function App() {
                 onDisconnect={handleDisconnect}
                 serverAddress={serverAddress || config.serverIP}
                 sessionStatus={sessionStatus}
+                renderFpsText={renderFpsText}
+                streamingFpsText={streamingFpsText}
+                poseToRenderText={poseToRenderText}
                 position={[0, 1.6, -1.8]}
                 rotation={[0, 0, 0]}
               />
