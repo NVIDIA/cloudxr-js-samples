@@ -38,7 +38,7 @@ module.exports = merge(common, {
     ...(useHttps && { server: 'https' }),
     static: [
       {
-        directory: path.join(__dirname, './build'),
+        directory: path.join(__dirname, 'build'),
       },
       {
         directory: path.join(__dirname, './public'),

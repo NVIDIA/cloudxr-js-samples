@@ -17,19 +17,19 @@
 
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { nvidiaCloudxrWebpackAlias } = require('../webpack-nvidia-cloudxr-alias.cjs');
 
 module.exports = {
   entry: './src/main.ts',
 
-  // Enable webpack 5 persistent filesystem caching for faster incremental builds
   cache: {
     type: 'filesystem',
+    name: 'simple',
     buildDependencies: {
       config: [__filename],
     },
   },
 
-  // Module rules define how different file types are processed
   module: {
     rules: [
       {
@@ -40,24 +40,22 @@ module.exports = {
     ],
   },
 
-  // Resolve configuration for module resolution
   resolve: {
     extensions: ['.ts', '.js'],
     alias: {
-      // @helpers can be used instead of relative paths to the helpers directory
       '@helpers': path.resolve(__dirname, './helpers'),
+      // If OVERRIDE_CLOUDXR_FILENAME is set (testing only), @nvidia/cloudxr resolves to that bundle
+      // basename next to package main—not for production. See ../webpack-nvidia-cloudxr-alias.cjs.
+      ...nvidiaCloudxrWebpackAlias(__dirname),
     },
   },
 
-  // Output configuration for bundled files
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, './build'),
+    path: path.resolve(__dirname, 'build'),
   },
 
-  // Webpack plugins that extend webpack's functionality
   plugins: [
-    // Generates HTML file and automatically injects bundled JavaScript
     new HtmlWebpackPlugin({
       template: './index.html',
       favicon: './favicon.ico',
