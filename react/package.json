@@ -17,7 +17,7 @@
     "dev": "webpack --config ./webpack.dev.js",
     "dev-server": "webpack serve --config ./webpack.dev.js --no-open",
     "dev-server:https": "cross-env HTTPS=true webpack serve --config ./webpack.dev.js --no-open",
-    "clean": "rimraf dist"
+    "clean": "rimraf build dist"
   },
   "dependencies": {
     "@nvidia/cloudxr": "dev",
