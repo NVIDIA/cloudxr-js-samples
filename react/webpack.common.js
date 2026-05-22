@@ -19,9 +19,8 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
+const { nvidiaCloudxrWebpackAlias } = require('../webpack-nvidia-cloudxr-alias.cjs');
 
-// WebXR input profile assets are used by default when @webxr-input-profiles/assets is installed.
-// Set USE_LOCAL_WEBXR_ASSETS=0 to skip bundling local assets (build needs internet at runtime to load assets).
 const useLocalWebxrAssets = process.env.USE_LOCAL_WEBXR_ASSETS !== '0';
 let webxrAssetsPackagePath = null;
 let WEBXR_ASSETS_VERSION = '';
@@ -40,15 +39,14 @@ if (useLocalWebxrAssets) {
 module.exports = {
   entry: './src/index.tsx',
 
-  // Enable webpack 5 persistent filesystem caching for faster incremental builds
   cache: {
     type: 'filesystem',
+    name: 'react',
     buildDependencies: {
       config: [__filename],
     },
   },
 
-  // Module rules define how different file types are processed
   module: {
     rules: [
       {
@@ -56,7 +54,6 @@ module.exports = {
         use: {
           loader: 'ts-loader',
           options: {
-            // Only transpile, don't type-check (faster builds)
             transpileOnly: true,
           },
         },
@@ -69,35 +66,31 @@ module.exports = {
     ],
   },
 
-  // Resolve configuration for module resolution
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     alias: {
-      // @helpers can be used instead of relative paths to the helpers directory
       '@helpers': path.resolve(__dirname, './helpers'),
+      // If OVERRIDE_CLOUDXR_FILENAME is set (testing only), @nvidia/cloudxr resolves to that bundle
+      // basename next to package main—not for production. See ../webpack-nvidia-cloudxr-alias.cjs.
+      ...nvidiaCloudxrWebpackAlias(__dirname),
     },
   },
 
-  // Output configuration for bundled files
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, './build'),
+    path: path.resolve(__dirname, 'build'),
   },
 
-  // Webpack plugins that extend webpack's functionality
   plugins: [
-    // Generates HTML file and automatically injects bundled JavaScript
     new HtmlWebpackPlugin({
       template: './src/index.html',
       favicon: './favicon.ico',
     }),
 
-    // Inject environment variables
     new webpack.DefinePlugin({
       'process.env.WEBXR_ASSETS_VERSION': JSON.stringify(WEBXR_ASSETS_VERSION),
     }),
 
-    // Copies WebXR input profile assets when available; always copies public and favicon
     new CopyWebpackPlugin({
       patterns: [
         ...(webxrAssetsPackagePath

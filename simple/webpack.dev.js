@@ -38,7 +38,7 @@ module.exports = merge(common, {
     // Enable HTTPS with self-signed certificate when HTTPS=true
     ...(useHttps && { server: 'https' }),
     static: {
-      directory: path.join(__dirname, './build'),
+      directory: path.join(__dirname, 'build'),
       watch: true,
     },
     watchFiles: {
