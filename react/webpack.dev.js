@@ -25,6 +25,7 @@ const useHttps = process.env.HTTPS === 'true';
 module.exports = merge(common, {
   mode: 'development',
   devtool: 'eval-source-map',
+  cache: { name: 'react-dev' },
   // New script URL every build so browser cannot serve cached bundle
   output: {
     filename: 'bundle.[contenthash:8].js',

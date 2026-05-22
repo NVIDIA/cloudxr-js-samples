@@ -20,6 +20,7 @@ const common = require('./webpack.common.js');
 
 module.exports = merge(common, {
   mode: 'production',
+  cache: { name: 'simple-prod' },
 });
 
 console.log(module.exports);
