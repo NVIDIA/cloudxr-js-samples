@@ -30,13 +30,6 @@
  * and disconnect when in XR mode.
  */
 
-import { checkCapabilities } from '@helpers/BrowserCapabilities';
-import { getDeviceProfile, resolveDeviceProfileId } from '@helpers/DeviceProfiles';
-import { loadIWERIfNeeded } from '@helpers/LoadIWER';
-import { overridePressureObserver } from '@helpers/overridePressureObserver';
-import { kPerformanceOptions } from '@helpers/PerformanceProfiles';
-import CloudXRComponent from '@helpers/react/CloudXRComponent';
-import { SimpleEnvironment } from '@helpers/react/SimpleEnvironment';
 import * as CloudXR from '@nvidia/cloudxr';
 import { getResolutionValidationError } from '@nvidia/cloudxr';
 import { signal, computed } from '@preact/signals-react';
@@ -46,36 +39,71 @@ import { XR, createXRStore, noEvents, PointerEvents, XROrigin, useXR } from '@re
 import type { XRDevice } from 'iwer';
 import { useState, useMemo, useEffect, useRef } from 'react';
 
+import CloudXRComponent from './cloudxr/CloudXRComponent';
 import { CloudXR2DUI } from './CloudXR2DUI';
 import CloudXR3DUI from './CloudXRUI';
+import { SimpleEnvironment } from './components/SimpleEnvironment';
+import { resolveStreamTestSeconds } from './config/resolve';
+import {
+  clearHudMetricSignalsForTerminalStatus,
+  poseSendFps,
+  poseSendFpsText,
+  poseToRenderText,
+  renderFps,
+  renderFpsText,
+  streamingFpsText,
+  streamingMetrics,
+} from './metrics/hudMetricSignals';
+import { createMetricsSnapshotBuffers } from './metrics/metricsHubChannel';
+import { isMetricsHubEnabled } from './metrics/metricsHubUrl';
+import type { MetricsSnapshotBuffers } from './metrics/metricsSnapshotBuffers';
+import { useMetricsHubChannel } from './metrics/useMetricsHubChannel';
+import { checkCapabilities } from './utils/BrowserCapabilities';
+import { getDeviceProfile, resolveDeviceProfileId } from './utils/DeviceProfiles';
+import { setIWERArBackground } from './utils/IWERBackground';
+import { loadIWERIfNeeded } from './utils/LoadIWER';
+import { requestMicPermission } from './utils/micPermission';
+import type { MicPermissionResult } from './utils/micPermission';
+import { overridePressureObserver } from './utils/overridePressureObserver';
+import { kPerformanceOptions } from './utils/PerformanceProfiles';
 
 // Override PressureObserver early to catch errors from buggy browser implementations
 overridePressureObserver();
 
 setPreferredColorScheme('dark');
 
-// Performance metrics signals - raw data from CloudXRComponent callbacks.
-const renderMetrics = signal<{ fps: number } | null>(null);
-const streamingMetrics = signal<{ fps: number; latencyMs: number } | null>(null);
-const renderFpsText = computed(() =>
-  renderMetrics.value ? renderMetrics.value.fps.toFixed(1) : '-'
-);
-const streamingFpsText = computed(() =>
-  streamingMetrics.value ? streamingMetrics.value.fps.toFixed(1) : '-'
-);
-const poseToRenderText = computed(() =>
-  streamingMetrics.value ? `${streamingMetrics.value.latencyMs.toFixed(1)}ms` : '-'
-);
+// Live session quality level (0–4); see CloudXR.QualityScore.
+const sessionQualitySignal = signal<number>(0);
+
+// Stream-test signal - text and traffic-light color for the in-VR panel. Module-scoped to match
+// the HUD metrics pattern; the result persists until a new session starts or the current one ends.
+const streamTest = signal<{ text: string; color: string } | null>(null);
+const streamTestText = computed(() => streamTest.value?.text ?? '');
+const streamTestColor = computed(() => streamTest.value?.color ?? 'white');
 
 function App() {
   // 2D UI management
   const [cloudXR2DUI, setCloudXR2DUI] = useState<CloudXR2DUI | null>(null);
+  // This ref is read by the session-start callback, which can run before React has rerendered.
+  const micPermissionResultRef = useRef<MicPermissionResult>('skipped');
   // IWER loading state
   const [iwerLoaded, setIwerLoaded] = useState(false);
 
   // Capability state management
   const [capabilitiesValid, setCapabilitiesValid] = useState(false);
   const capabilitiesCheckedRef = useRef(false);
+  // App-owned stream-test countdown timer (the SDK only signals window start/stop).
+  const streamTestCountdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Clear the countdown if the component unmounts mid-test (e.g. user exits XR).
+  useEffect(
+    () => () => {
+      if (streamTestCountdownRef.current) {
+        clearInterval(streamTestCountdownRef.current);
+        streamTestCountdownRef.current = null;
+      }
+    },
+    []
+  );
   // Connection state management
   const [isConnected, setIsConnected] = useState(false);
   // Session status management
@@ -135,13 +163,16 @@ function App() {
       // Disable button and show checking status
       cloudXR2DUI.setStartButtonState(true, 'CONNECT (checking capabilities)');
 
+      // Set by the IWER load effect above; passed to checkCapabilities to skip browser
+      // version checks that don't apply when running under a desktop XR emulator.
+      const iwerWasLoaded = sessionStorage.getItem('iwerWasLoaded') === 'true';
       let result: { success: boolean; failures: string[]; warnings: string[] } = {
         success: false,
         failures: [],
         warnings: [],
       };
       try {
-        result = await checkCapabilities();
+        result = await checkCapabilities(iwerWasLoaded);
       } catch (error) {
         cloudXR2DUI.showStatus(`Capability check error: ${error}`, 'error');
         setCapabilitiesValid(false);
@@ -161,7 +192,6 @@ function App() {
       }
 
       // Show final status message with IWER info if applicable
-      const iwerWasLoaded = sessionStorage.getItem('iwerWasLoaded') === 'true';
       if (result.warnings.length > 0) {
         cloudXR2DUI.showStatus('Performance notice:\n' + result.warnings.join('\n'), 'info');
       } else if (iwerWasLoaded) {
@@ -204,10 +234,13 @@ function App() {
       createXRStore({
         emulate: false, // Disable IWER emulation from react in favor of custom iwer loading function
         foveation: xrFoveation,
+        // CloudXRComponent applies the configured rate before CloudXR negotiates the stream.
+        // Disabling the store's automatic "high" preference avoids racing that negotiation.
+        frameRate: false,
         frameBufferScaling: xrFrameBufferScaling,
         // Use local WebXR input profile assets only when bundled (optional build without assets)
         ...(process.env.WEBXR_ASSETS_VERSION && {
-          baseAssetPath: `${new URL('.', window.location).href}npm/@webxr-input-profiles/assets@${process.env.WEBXR_ASSETS_VERSION}/dist/profiles/`,
+          baseAssetPath: `${new URL('.', window.location.href).href}npm/@webxr-input-profiles/assets@${process.env.WEBXR_ASSETS_VERSION}/dist/profiles/`,
         }),
         hand: {
           model: false, // Disable hand models but keep pointer functionality
@@ -239,6 +272,9 @@ function App() {
     ui.initialize();
     ui.setupConnectButtonHandler(
       async () => {
+        // Reset React state so an identical failure from this retry is delivered again.
+        setErrorMessage('');
+
         const config = ui.getConfiguration();
         const resolutionError = getResolutionValidationError(
           config.perEyeWidth,
@@ -248,6 +284,24 @@ function App() {
           ui.updateConnectButtonState();
           return;
         }
+
+        // Show the browser's microphone prompt while this click still owns the user gesture,
+        // before WebXR becomes immersive. Chrome can exit immersive mode when this prompt
+        // appears after enterAR()/enterVR().
+        const result = await requestMicPermission(config.micEnabled !== false);
+        micPermissionResultRef.current = result;
+        if (result === 'denied') {
+          ui.showError(
+            'Microphone permission denied — grant mic access, or disable upstream audio and try again.'
+          );
+          ui.setStartButtonState(false, 'CONNECT');
+          ui.updateConnectButtonState();
+          return;
+        }
+        if (result === 'unavailable') {
+          ui.showStatus('No microphone found — connecting without audio.', 'info');
+        }
+
         // Start XR session
         if (config.immersiveMode === 'ar') {
           await store.enterAR();
@@ -256,24 +310,6 @@ function App() {
         } else {
           setErrorMessage('Unrecognized immersive mode');
         }
-        store.setFrameRate((supportedFrameRates: ArrayLike<number>): number | false => {
-          let frameRate = ui.getConfiguration().deviceFrameRate;
-          // ArrayLike may not have includes; do a manual search.
-          let found = false;
-          for (let i = 0; i < supportedFrameRates.length; ++i) {
-            if (supportedFrameRates[i] === frameRate) {
-              found = true;
-              break;
-            }
-          }
-          if (found) {
-            console.info('Requested frame rate', frameRate, 'is supported; requested it.');
-            return frameRate;
-          } else {
-            console.warn('Requested frame rate', frameRate, 'is not supported; using default.');
-            return false;
-          }
-        });
       },
       (error: Error) => {
         setErrorMessage(`Failed to start XR session: ${error}`);
@@ -310,12 +346,26 @@ function App() {
         // XR session is active
 
         setIsXRMode(true);
+        // Under IWER on desktop there is no real passthrough, so the emulator
+        // composites the transparent XR canvas over this page's HTML. Replace
+        // that bleed-through with a neutral dark checkerboard for passthrough AR
+        // only. Gate on the true IWER-runtime signal (sessionStorage) rather
+        // than the `iwerLoaded` state, which just means immersive-ready and is
+        // also true on real headsets, and confirm passthrough via the session's
+        // blend mode (matching the simple example). No-op on real devices, in
+        // VR, and in opaque AR.
+        const iwerWasLoaded = sessionStorage.getItem('iwerWasLoaded') === 'true';
+        const isPassthrough =
+          xrState.session != null && xrState.session.environmentBlendMode !== 'opaque';
+        setIWERArBackground(iwerWasLoaded && xrState.mode === 'immersive-ar' && isPassthrough);
         if (cloudXR2DUI) {
           cloudXR2DUI.setStartButtonState(true, 'CONNECT (XR session active)');
         }
       } else {
         // XR session ended
         setIsXRMode(false);
+        // Restore the normal page background (removes the IWER AR checkerboard).
+        setIWERArBackground(false);
         if (cloudXR2DUI) {
           cloudXR2DUI.setStartButtonState(false, 'CONNECT');
           cloudXR2DUI.updateConnectButtonState();
@@ -334,13 +384,38 @@ function App() {
     return () => {
       unsubscribe();
       setIsXRMode(false);
+      // Ensure the emulated-AR backdrop never outlives this component.
+      setIWERArBackground(false);
     };
   }, [cloudXR2DUI, store]);
 
-  // CloudXR status change handler
+  /**
+   * Updates connection status and clears stale metrics when the stream ends.
+   * @param connected - True when the stream is connected.
+   * @param status - Human-readable session status string.
+   */
   const handleStatusChange = (connected: boolean, status: string) => {
     setIsConnected(connected);
     setSessionStatus(status);
+    if (!connected || status !== 'Connected') {
+      // Clear the previous session's indicator until fresh quality data arrives.
+      sessionQualitySignal.value = 0;
+    }
+    clearHudMetricSignalsForTerminalStatus(status);
+    // Forward streaming state to the hub (no-op when the channel is inactive).
+    metricsHubRef.current?.sendStreamStatus(connected && status === 'Connected');
+  };
+
+  const handleSessionReady = (session: CloudXR.Session | null) => {
+    // Clear the network-test indicator and countdown on both a new session and a teardown.
+    // onStreamTestStopped does not fire on a mid-test disconnect (abort is not a result), so this
+    // is what stops a countdown still running when the user disconnects during the test window.
+    if (streamTestCountdownRef.current) {
+      clearInterval(streamTestCountdownRef.current);
+      streamTestCountdownRef.current = null;
+    }
+    streamTest.value = null;
+    setCloudXRSession(session);
   };
 
   /**
@@ -417,15 +492,131 @@ function App() {
     }
   };
 
-  const handleRenderPerformanceMetrics = (fps: number) => {
-    renderMetrics.value = { fps };
+  // CloudXR metrics hub (opt-in via ?oobEnable=1). Buffer the SDK metrics and
+  // push them to the hub; ref keeps the buffers stable across re-renders.
+  const metricsSnapshotBuffersRef = useRef<ReturnType<typeof createMetricsSnapshotBuffers> | null>(
+    null
+  );
+  if (metricsSnapshotBuffersRef.current === null) {
+    metricsSnapshotBuffersRef.current = createMetricsSnapshotBuffers();
+  }
+
+  // Hub host is the CloudXR stream Server IP (no separate param); set by onServerAddress.
+  const hubServerIP = useMemo(() => serverAddress.trim(), [serverAddress]);
+
+  // Constant URL opt-in (?oobEnable=1); gates the per-frame recording below.
+  const oobEnabled = useMemo(
+    () => isMetricsHubEnabled(new URLSearchParams(window.location.search)),
+    []
+  );
+  const metricsHubRef = useMetricsHubChannel({
+    // Hook bails on oobEnable/hubServerIP itself, so only the UI-ready gate is needed here.
+    enabled: cloudXR2DUI !== null,
+    hubServerIP,
+    getMetricsSnapshot: () => metricsSnapshotBuffersRef.current!.takeSnapshot(),
+  });
+
+  /** Feed render FPS and pose send FPS to the HUD signals and record the sample to the hub render buffer when active. */
+  const handleRenderPerformanceMetrics = (
+    metrics: Parameters<MetricsSnapshotBuffers['recordRender']>[0]
+  ) => {
+    if (metrics.framerate !== undefined) renderFps.value = metrics.framerate;
+    if (metrics.sendFramerate !== undefined) poseSendFps.value = metrics.sendFramerate;
+    // sendBegin and renderBegin emit separate PerRender callbacks, so any key alone is sufficient.
+    if (
+      oobEnabled &&
+      (metrics.framerate !== undefined ||
+        metrics.sendFramerate !== undefined ||
+        metrics.xrPoseAgeMs !== undefined)
+    )
+      metricsSnapshotBuffersRef.current!.recordRender(metrics);
   };
-  const handleStreamingPerformanceMetrics = (fps: number, latencyMs: number) => {
-    streamingMetrics.value = { fps, latencyMs };
+
+  /** Update the streaming HUD signal (FPS + latency) and forward the sample to the hub frame buffer when active. */
+  const handleStreamingPerformanceMetrics = (
+    metrics: Parameters<MetricsSnapshotBuffers['recordFrame']>[0]
+  ) => {
+    // Preserve previous HUD values for fields absent in this partial callback.
+    if (metrics.framerate !== undefined || metrics.poseToRenderTimeMs !== undefined) {
+      const prev = streamingMetrics.value ?? { fps: 0, latencyMs: 0 };
+      streamingMetrics.value = {
+        fps: metrics.framerate ?? prev.fps,
+        latencyMs: metrics.poseToRenderTimeMs ?? prev.latencyMs,
+      };
+    }
+    if (oobEnabled) metricsSnapshotBuffersRef.current!.recordFrame(metrics);
+  };
+
+  /** Forward network metrics to the hub buffer; no-op when hub is inactive. */
+  const handleNetworkPerformanceMetrics = (
+    metrics: Parameters<MetricsSnapshotBuffers['recordNetwork']>[0]
+  ) => {
+    if (metrics.sessionQuality !== undefined) {
+      // Keep the quality indicator synced with the latest per-network cadence sample.
+      sessionQualitySignal.value = metrics.sessionQuality;
+    }
+    // Partial updates are OK; empty structs are skipped inside recordNetwork.
+    if (oobEnabled) metricsSnapshotBuffersRef.current!.recordNetwork(metrics);
+  };
+
+  const stopNetworkTestCountdown = () => {
+    if (streamTestCountdownRef.current) {
+      clearInterval(streamTestCountdownRef.current);
+      streamTestCountdownRef.current = null;
+    }
+  };
+
+  // Fired once when the measurement window begins; app drives its own countdown from config.
+  const handleStreamTestStarted = () => {
+    stopNetworkTestCountdown();
+    // Normalize once so the countdown mirrors the SDK-supported measurement window.
+    let remaining = resolveStreamTestSeconds(config?.streamTestDurationSeconds);
+    const tick = () => {
+      // Hold at 0 until the result arrives; don't tick into negatives.
+      if (remaining <= 0) {
+        streamTest.value = { text: 'Testing network… 0s', color: '#ffd24d' };
+        stopNetworkTestCountdown();
+        return;
+      }
+      streamTest.value = { text: `Testing network… ${remaining}s`, color: '#ffd24d' };
+      remaining -= 1;
+    };
+    tick();
+    streamTestCountdownRef.current = setInterval(tick, 1000);
+  };
+
+  const handleStreamTestStopped = (result: CloudXR.StreamTestResult) => {
+    stopNetworkTestCountdown();
+    // Light is consistent with the gate: red ⟺ failed. On a pass, green when every gated dimension
+    // is Good+, else yellow as a caution (a gated dimension came back only Poor/Fair).
+    let color: string;
+    let label: string;
+    // Worst over the gated dimensions that have data; empty (all NoData) treated as NoData.
+    const measured = [
+      result.latencyScore,
+      result.jitterScore,
+      result.bandwidthScore,
+      result.devicePerformanceScore,
+    ].filter(s => s !== CloudXR.QualityScore.NoData);
+    if (!result.passed) {
+      color = '#ff5d5d'; // red — failed the gate
+      label = 'failed';
+    } else {
+      const worst = measured.length ? Math.min(...measured) : CloudXR.QualityScore.NoData;
+      color = worst >= CloudXR.QualityScore.Good ? '#5dd35d' : '#ffd24d';
+      label = 'passed';
+    }
+    // QualityScore is a numeric enum; reverse-map to its name (e.g. Excellent, Poor) so the panel
+    // reads as a quality rating rather than an ambiguous "5/5".
+    const scoreName = (s: CloudXR.QualityScore) => CloudXR.QualityScore[s];
+    streamTest.value = {
+      text: `Stream test ${label} — latency: ${scoreName(result.latencyScore)}, jitter: ${scoreName(result.jitterScore)}, ${result.serverFps ?? '-'} fps`,
+      color,
+    };
   };
 
   // Memo config based on configVersion (manual dependency tracker incremented on config changes)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   const config = useMemo(
     () => (cloudXR2DUI ? cloudXR2DUI.getConfiguration() : null),
     [cloudXR2DUI, configVersion]
@@ -447,7 +638,9 @@ function App() {
   // Set up message receiving from MessageChannel (new API) or legacy callback
   // Poll for channel availability since channels can be announced at any time
   useEffect(() => {
-    if (!cloudXRSession) {
+    // Wait for Connected: opening a channel sends a control message that requires the
+    // session to be connected (it is still Connecting during the network test).
+    if (!cloudXRSession || !isConnected) {
       return;
     }
 
@@ -507,7 +700,7 @@ function App() {
       active = false;
       clearInterval(pollInterval);
     };
-  }, [cloudXRSession]);
+  }, [cloudXRSession, isConnected]);
 
   return (
     <>
@@ -528,7 +721,7 @@ function App() {
           stencil: false,
           antialias:
             deviceProfile.web?.webglAntialias ?? kPerformanceOptions.webglContext_antialias,
-          desynchronized: false,
+          // desynchronized omitted — WebGL spec defaults to false (synchronous presentation), so the explicit opt-out is redundant.
           failIfMajorPerformanceCaveat: true,
           powerPreference: deviceProfile.web?.powerPreference ?? 'high-performance', // R3F default, but being explicit
           premultipliedAlpha: false,
@@ -547,6 +740,7 @@ function App() {
             <>
               <CloudXRComponent
                 config={config}
+                micPermissionResultRef={micPermissionResultRef}
                 applicationName="CloudXR React Example"
                 onStatusChange={handleStatusChange}
                 onError={error => {
@@ -554,10 +748,22 @@ function App() {
                     cloudXR2DUI.showError(error);
                   }
                 }}
-                onSessionReady={setCloudXRSession}
+                onSessionReady={handleSessionReady}
                 onServerAddress={setServerAddress}
                 onRenderPerformanceMetrics={handleRenderPerformanceMetrics}
                 onStreamingPerformanceMetrics={handleStreamingPerformanceMetrics}
+                onNetworkPerformanceMetrics={handleNetworkPerformanceMetrics}
+                streamTest={
+                  config.streamTestMode && config.streamTestMode !== 'off'
+                    ? {
+                        // Normalize before passing config so the UI and SDK use the same duration.
+                        durationSeconds: resolveStreamTestSeconds(config.streamTestDurationSeconds),
+                        mode: config.streamTestMode,
+                      }
+                    : undefined
+                }
+                onStreamTestStarted={handleStreamTestStarted}
+                onStreamTestStopped={handleStreamTestStopped}
               />
               <CloudXR3DUI
                 onAction1={handleAction1}
@@ -566,8 +772,12 @@ function App() {
                 serverAddress={serverAddress || config.serverIP}
                 sessionStatus={sessionStatus}
                 renderFpsText={renderFpsText}
+                poseSendFpsText={poseSendFpsText}
                 streamingFpsText={streamingFpsText}
                 poseToRenderText={poseToRenderText}
+                sessionQuality={sessionQualitySignal}
+                streamTestText={streamTestText}
+                streamTestColor={streamTestColor}
                 position={[0, 1.6, -1.8]}
                 rotation={[0, 0, 0]}
               />

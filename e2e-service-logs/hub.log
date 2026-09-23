@@ -1,0 +1,32 @@
+
+added 34 packages in 6s
+
+> cloudxr-metrics-hub@6.4.0 start:http
+> npm run build && tsx server.ts --http
+
+
+> cloudxr-metrics-hub@6.4.0 build
+> esbuild src/main.ts --bundle --outfile=build/bundle.js --format=esm --platform=browser && esbuild src/logs.ts --bundle --outfile=build/logs.bundle.js --format=esm --platform=browser && cp index.html build/index.html && cp logs.html build/logs.html
+
+
+  build/bundle.js   185.8kb
+  build/bundle.css   13.7kb
+
+⚡ Done in 62ms
+
+  build/logs.bundle.js   22.0kb
+  build/logs.bundle.css  11.7kb
+
+⚡ Done in 20ms
+[OperatorHub] listening on *:8787 (all interfaces, plaintext HTTP)
+[OperatorHub] Hub UI at 127.0.0.1:8787/ (--http plaintext mode)
+[OperatorHub] WebSocket endpoint 127.0.0.1:8787/oob/v1/ws (plaintext)
+[OperatorHub] State API 127.0.0.1:8787/api/oob/v1/state (plaintext)
+[OperatorHub] Plaintext mode (--http) — for local dev only; use the default HTTPS hub with HTTPS clients
+[OperatorHub] Sample client: ?oobEnable=1&hubPort=8787 — set CloudXR Server IP to the hub host
+[OperatorHub] WS upgrade %s from %s origin=%s /oob/v1/ws ::ffff:127.0.0.1 http://webapp:8080
+[OperatorHub] peer connected %s from %s conn-1790131170942-9qcv74 ::ffff:127.0.0.1
+[OperatorHub] register role=%s conn=%s headset conn-1790131170942-9qcv74
+[OperatorHub] headset online id=%s clientId=%s label=%s operators=%d headsets=%d headset-1 f023025c-f23a-4c42-92f3-f449c217de88 (none) 0 1
+[OperatorHub] peer closed conn=%s role=%s code=%s reason=%s headsets=%d operators=%d conn-1790131170942-9qcv74 headset headset-1 1001  1 0
+[OperatorHub] headset offline id=%s clientId=%s headset-1 f023025c-f23a-4c42-92f3-f449c217de88
