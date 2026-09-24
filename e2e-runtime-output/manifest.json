@@ -1,0 +1,16 @@
+{
+  "extractedAt": "2026-09-23T15:12:25.453081+00:00",
+  "sessions": [
+    {
+      "session": "2026-09-23T151116Z",
+      "timestampUtc": "2026-09-23T15:11:16+00:00",
+      "dir": "session_2026-09-23T151116Z",
+      "logs": [
+        "cxr_streamsdk.2026-09-23T151116Z.000.log"
+      ],
+      "etls": [
+        "NvStreamer-20260923-151144.etli"
+      ]
+    }
+  ]
+}

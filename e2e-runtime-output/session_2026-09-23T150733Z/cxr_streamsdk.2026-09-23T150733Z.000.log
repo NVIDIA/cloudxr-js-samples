@@ -1,0 +1,147 @@
+(M)[2026-09-23 15:07:34,675]=15:07:34=*00000*{95528358913769022}^0001^<VersionDump>      Name: streamsdk-server
+(M)[2026-09-23 15:07:34,676]=15:07:34=*00000*{95528358913769022}^0001^<VersionDump>      DVS Branch: unknown
+(M)[2026-09-23 15:07:34,676]=15:07:34=*00000*{95528358913769022}^0001^<VersionDump>      DVS P4VirtualChangelist: 0
+(M)[2026-09-23 15:07:34,677]=15:07:34=*00001*{95528358913769022}^0001^<Server>           Using: OpenSSL 3.5.7 9 Jun 2026
+(M)[2026-09-23 15:07:34,721]=15:07:34=*00044*{95528358913769022}^0001^<Server>           RND is initialized
+(M)[2026-09-23 15:07:34,722]=15:07:34=*00000*{95528358913769022}^0001^<Server>           --- 56:71:15:56:0B:3B: 10.1.107.28 / unused
+(M)[2026-09-23 15:07:34,722]=15:07:34=*00000*{95528358913769022}^0001^<Server>           --- 56:71:15:56:0B:3B: 10.1.107.28 / unused
+(M)[2026-09-23 15:07:34,749]=15:07:34=*00027*{95528358913769022}^0001^<NvEncUtil>        Computing SPS/PPS headers.
+(W)[2026-09-23 15:07:34,749]=15:07:34=*00000*{95528358913769022}^0001^<VideoFrameCtxt>   Couldn't find VideoFrameContext for this thread.
+(M)[2026-09-23 15:07:34,749]=15:07:34=*00000*{95528358913769022}^0001^<AdapterContext>   Initializing Adapter context
+(M)[2026-09-23 15:07:34,750]=15:07:34=*00000*{95528358913769022}^0001^<AdapterContext>   Initialized context for adapter 0: 1280 x 720 @ 60.0 Hz
+(M)[2026-09-23 15:07:34,750]=15:07:34=*00000*{95528358913769022}^0001^<AdapterContext>   System is NOT co-proc.
+(M)[2026-09-23 15:07:34,851]=15:07:34=*00101*{95528358913769022}^0001^<AdapterContext>   GPU memory usage: used = 2045.125000, free = 46465.812500 MB, total = 48510.937500 MB
+(M)[2026-09-23 15:07:34,851]=15:07:34=*00000*{95528358913769022}^0001^<AdapterContext>   Initialized CUDA for device 'NVIDIA L40' (SM 8.9) in compute mode 'CU_COMPUTEMODE_DEFAULT'.
+(W)[2026-09-23 15:07:34,854]=15:07:34=*00002*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(M)[2026-09-23 15:07:34,854]=15:07:34=*00000*{95528358913769022}^0001^<VideoEncoder>     Initializing NvEnc12VideoEncoder.
+(M)[2026-09-23 15:07:34,854]=15:07:34=*00000*{95528358913769022}^0001^<NvEnc12VideoEnco> Using NvEnc header version 12.0.
+(W)[2026-09-23 15:07:34,854]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,864]=15:07:34=*00010*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,864]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,879]=15:07:34=*00014*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,879]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,885]=15:07:34=*00006*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,885]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,892]=15:07:34=*00006*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,892]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,899]=15:07:34=*00006*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,899]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,906]=15:07:34=*00006*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,906]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,912]=15:07:34=*00006*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,912]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,919]=15:07:34=*00006*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,919]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,925]=15:07:34=*00006*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,926]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,932]=15:07:34=*00006*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,932]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,939]=15:07:34=*00006*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,939]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,951]=15:07:34=*00012*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,951]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,958]=15:07:34=*00006*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,958]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,964]=15:07:34=*00006*{95528358913769022}^0001^<CodecStatics>     Failed to read the Av1Disable regkey (CONFIG_STATUS result = 1); using default value of 0.
+(W)[2026-09-23 15:07:34,964]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,964]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,971]=15:07:34=*00006*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,971]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,977]=15:07:34=*00006*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,977]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,984]=15:07:34=*00006*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,984]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,990]=15:07:34=*00006*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:07:34,990]=15:07:34=*00000*{95528358913769022}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(M)[2026-09-23 15:07:34,996]=15:07:34=*00006*{95528358913769022}^0001^<AdapterContext>   GPU memory usage: used = 2045.125000, free = 46465.812500 MB, total = 48510.937500 MB
+(W)[2026-09-23 15:07:35,063]=15:07:35=*00066*{95528358913769022}^0001^<AsyncTraceReport> There are 7 unreported trace events. Likely due to setTracingInterface not called in AdapterContext
+(W)[2026-09-23 15:07:35,063]=15:07:35=*00000*{95528358913769022}^0001^<VideoEncoder>     VideoEncoder was not deinitialized prior to destruction!
+(M)[2026-09-23 15:07:35,063]=15:07:35=*00000*{95528358913769022}^0001^<NvEncUtil>        Finished computing SPS/PPS headers.
+(M)[2026-09-23 15:07:35,065]=15:07:35=*00000*{3913252051418530327}^0001^<Signaling>        Signaling server started.
+(M)[2026-09-23 15:08:09,414]=15:08:09=*34349*{3913252051418530327}^0001^<Server>           Server is now configuring.
+(W)[2026-09-23 15:08:09,697]=15:08:09=*00282*{3913252051418530327}^0001^<NvNetworkCommon>  Network Address To String: invalid parameters 0x70d860044ab0, 0x70d860044ad0, 48
+(W)[2026-09-23 15:08:09,697]=15:08:09=*00000*{3913252051418530327}^0001^<NattHolePunch>    Address: invalid is not valid
+(W)[2026-09-23 15:08:09,697]=15:08:09=*00000*{3913252051418530327}^0001^<NattHolePunch>    Add destination addresses failed since it is empty for port 47998.
+(W)[2026-09-23 15:08:09,708]=15:08:09=*00010*{3913252051418530327}^0001^<NattHolePunch>    Add destination addresses failed since it is empty for port 47998.
+(W)[2026-09-23 15:08:09,708]=15:08:09=*00000*{574208224333996391}^0001^<BasicThread>      Thread 152 prioritization request was denied because this process is not running under an enhanced OS priority.
+(W)[2026-09-23 15:08:09,709]=15:08:09=*00000*{3913252051418530327}^0001^<NattHolePunch>    Add destination addresses failed since it is empty for port 47998.
+(W)[2026-09-23 15:08:09,709]=15:08:09=*00000*{3913252051418530327}^0001^<NattHolePunch>    PUBLIC_ENDPOINT_CANDIDATES flag set but endpoint not configured (address='', port=0)
+(W)[2026-09-23 15:08:09,713]=15:08:09=*00004*{574208224333996391}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:08:09,714]=15:08:09=*00000*{574208224333996391}^0001^<WebRtcTrans>      No sender for source id 2
+(W)[2026-09-23 15:08:09,714]=15:08:09=*00000*{574208224333996391}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(M)[2026-09-23 15:08:09,714]=15:08:09=*00000*{574208224333996391}^0001^<VideoStreamer>    Stream:0 Creating video streamer.
+(W)[2026-09-23 15:08:09,726]=15:08:09=*00000*{6889807121034779922}^0001^<NvNetworkCommon>  Network Address To String: invalid parameters 0x70d8600901d8, 0x70d8600901f8, 48
+(E)[2026-09-23 15:08:09,729]=15:08:09=*00019*{3913252051418530327}^0001^<STREAM_SERVER>    Unexpected exception during API call 'nvstSetRemotePeerIceCandidate': StreamSdkException 800b1000 [NVST_R_INVALID_STATE] The server[2] has not yet been created.  Use nvstCreateServer().
+(M)[2026-09-23 15:08:09,798]=15:08:09=*00083*{574208224333996391}^0001^<NvscStreamingSes> WebRtcTransport for audio has built-in encryption
+(M)[2026-09-23 15:08:09,798]=15:08:09=*00000*{574208224333996391}^0001^<NvscStreamingSes> WebRtcTransport for mic has built-in encryption
+(M)[2026-09-23 15:08:09,798]=15:08:09=*00000*{574208224333996391}^0001^<RtpAudioStreamer> Audio streaming using WebRtcTransport
+(M)[2026-09-23 15:08:09,798]=15:08:09=*00000*{574208224333996391}^0001^<RtpAudioStreamer> Audio streamer parameters: m_packetDuration = 10, bitrate = 256000, channels = 2,     multimappingmode = 0, useVBR = 1
+(M)[2026-09-23 15:08:09,803]=15:08:09=*00005*{574208224333996391}^0001^<RtpAudioStreamer> Enabling RED audio redundancy
+(M)[2026-09-23 15:08:09,803]=15:08:09=*00000*{574208224333996391}^0001^<RtpAudioControll> Started audio session 0x0x70d8481e8a30
+(W)[2026-09-23 15:08:09,803]=15:08:09=*00000*{574208224333996391}^0001^<Observer>         Queued command: 0x00000111 for label: control_channel 
+(E)[2026-09-23 15:08:09,803]=15:08:09=*00000*{574208224333996391}^0001^<NvBitstreamParse> Unsupported Video Codec 0
+(W)[2026-09-23 15:08:09,803]=15:08:09=*00000*{574208224333996391}^0001^<VideoSender>      Client requested an unknown streaming format 4096x4032@90hz!  Results may be unpredictable.
+(W)[2026-09-23 15:08:09,805]=15:08:09=*00001*{574208224333996391}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:08:09,805]=15:08:09=*00000*{574208224333996391}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:08:09,805]=15:08:09=*00000*{574208224333996391}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(M)[2026-09-23 15:08:09,807]=15:08:09=*00002*{574208224333996391}^0001^<AdapterContext>   Initializing Adapter context
+(M)[2026-09-23 15:08:09,807]=15:08:09=*00000*{574208224333996391}^0001^<AdapterContext>   Initialized context for adapter 0: 1280 x 720 @ 60.0 Hz
+(M)[2026-09-23 15:08:09,807]=15:08:09=*00000*{574208224333996391}^0001^<AdapterContext>   System is NOT co-proc.
+(M)[2026-09-23 15:08:09,807]=15:08:09=*00000*{574208224333996391}^0001^<AdapterContext>   GPU memory usage: used = 1721.375000, free = 46789.562500 MB, total = 48510.937500 MB
+(M)[2026-09-23 15:08:09,807]=15:08:09=*00000*{574208224333996391}^0001^<AdapterContext>   Initialized CUDA for device 'NVIDIA L40' (SM 8.9) in compute mode 'CU_COMPUTEMODE_DEFAULT'.
+(M)[2026-09-23 15:08:09,807]=15:08:09=*00000*{574208224333996391}^0001^<VideoEncoder>     Initializing NvEnc12VideoEncoder.
+(M)[2026-09-23 15:08:09,807]=15:08:09=*00000*{574208224333996391}^0001^<NvEnc12VideoEnco> Using NvEnc header version 12.0.
+(W)[2026-09-23 15:08:09,809]=15:08:09=*00001*{574208224333996391}^0001^<Utils>            The GPU with device ID 9909 is not white-listed.  It may not work well with this software.
+(W)[2026-09-23 15:08:09,811]=15:08:09=*00084*{6889807121034779922}^0001^<SctpDCCTS>        OnBufferedAmountLow called with invalid streamId 0
+(W)[2026-09-23 15:08:09,814]=15:08:09=*00003*{6889807121034779922}^0001^<SctpDCCTS>        OnBufferedAmountLow called with invalid streamId 2
+(W)[2026-09-23 15:08:09,815]=15:08:09=*00001*{6889807121034779922}^0001^<SctpDCCTS>        OnBufferedAmountLow called with invalid streamId 4
+(M)[2026-09-23 15:08:09,825]=15:08:09=*00016*{574208224333996391}^0001^<VideoEncoder>     The Color Space Mode being used is 2 (NVST_CSCM_LIMITED_YCBCR_BT709)
+(M)[2026-09-23 15:08:09,833]=15:08:09=*00008*{574208224333996391}^0001^<NvEnc12VideoEnco> Max number of reference frames configured 1 for 4096x4032 at frame: 0
+(M)[2026-09-23 15:08:09,833]=15:08:09=*00000*{574208224333996391}^0001^<NvEnc12VideoEnco> Stream:0 H264 video format selected
+(M)[2026-09-23 15:08:09,833]=15:08:09=*00000*{574208224333996391}^0001^<NvEnc12VideoEnco> RateControl mode NV_ENC_PARAMS_RC_CBR is selected for 4032@90 at frame: 0
+(M)[2026-09-23 15:08:09,834]=15:08:09=*00000*{574208224333996391}^0001^<NvEnc12VideoEnco> Multi pass encoding configured as NV_ENC_TWO_PASS_FULL_RESOLUTION at frame: 0
+(M)[2026-09-23 15:08:09,834]=15:08:09=*00000*{574208224333996391}^0001^<NvEnc12VideoEnco> Multi-reference encoding is enabled
+(M)[2026-09-23 15:08:09,834]=15:08:09=*00000*{574208224333996391}^0001^<NvEnc12VideoEnco> Encoder preset configured PRESET_LOW_LATENCY_HP
+(M)[2026-09-23 15:08:09,834]=15:08:09=*00000*{574208224333996391}^0001^<NvEnc12VideoEnco> Encoder preset used PRESET_NVENC_P4
+(W)[2026-09-23 15:08:09,923]=15:08:09=*00088*{574208224333996391}^0001^<VideoStreamer>    QoS status callback is not set for stream packed.
+(M)[2026-09-23 15:08:09,923]=15:08:09=*00000*{574208224333996391}^0001^<VideoStreamer>    Windows version is non-Windows.
+(M)[2026-09-23 15:08:09,923]=15:08:09=*00000*{574208224333996391}^0001^<VideoStreamer>    Stream:0 Created video streaming connection
+(W)[2026-09-23 15:08:09,960]=15:08:09=*00000*{15284184344657602007}^0001^<ClientControl>    Command 20d took 12 ms to process, count:1
+(M)[2026-09-23 15:08:10,177]=15:08:10=*00000*{6466933351539423280}^0001^<NvEnc12VideoEnco> Changing encoder resolution to 0 x 0.
+(M)[2026-09-23 15:08:10,225]=15:08:10=*00000*{1861841682106695652}^0001^<VideoStreamer>    Stream:0 Frame 1 is an I-Frame.
+(M)[2026-09-23 15:08:10,225]=15:08:10=*00000*{1861841682106695652}^0001^<VideoStreamer>    Server sent the first video frame to client for stream:0
+(M)[2026-09-23 15:08:10,225]=15:08:10=*00000*{1861841682106695652}^0001^<VideoStreamer>    stream:0 capture frame state is SDR
+(W)[2026-09-23 15:08:10,773]=15:08:10=*00547*{1861841682106695652}^0001^<BandwidthEstimat> [2] Frame interval is HIGH! This frame interval:273.608000, expected:32.725500
+(W)[2026-09-23 15:08:11,047]=15:08:11=*00273*{1861841682106695652}^0001^<BandwidthEstimat> [3] Frame interval is HIGH! This frame interval:273.924000, expected:47.800406
+(M)[2026-09-23 15:08:12,321]=15:08:12=*02144*{6466933351539423280}^0001^<NvEnc12VideoEnco> Changing encoder resolution to 4096 x 4032.
+(E)[2026-09-23 15:08:14,849]=15:08:14=*05120*{3913252051418530327}^0001^<STREAM_SERVER>    Unexpected exception during API call 'nvstTraceClientBlobStats': StreamSdkException 800b1000 [NVST_R_INVALID_STATE] The server[2] has not yet been created.  Use nvstCreateServer().
+(E)[2026-09-23 15:08:19,847]=15:08:19=*04997*{3913252051418530327}^0001^<STREAM_SERVER>    Unexpected exception during API call 'nvstTraceClientBlobStats': StreamSdkException 800b1000 [NVST_R_INVALID_STATE] The server[2] has not yet been created.  Use nvstCreateServer().
+(E)[2026-09-23 15:08:24,846]=15:08:24=*04999*{3913252051418530327}^0001^<STREAM_SERVER>    Unexpected exception during API call 'nvstTraceClientBlobStats': StreamSdkException 800b1000 [NVST_R_INVALID_STATE] The server[2] has not yet been created.  Use nvstCreateServer().
+(E)[2026-09-23 15:08:29,846]=15:08:29=*04999*{3913252051418530327}^0001^<STREAM_SERVER>    Unexpected exception during API call 'nvstTraceClientBlobStats': StreamSdkException 800b1000 [NVST_R_INVALID_STATE] The server[2] has not yet been created.  Use nvstCreateServer().
+(E)[2026-09-23 15:08:34,846]=15:08:34=*04999*{3913252051418530327}^0001^<STREAM_SERVER>    Unexpected exception during API call 'nvstTraceClientBlobStats': StreamSdkException 800b1000 [NVST_R_INVALID_STATE] The server[2] has not yet been created.  Use nvstCreateServer().
+(E)[2026-09-23 15:08:38,768]=15:08:38=*28952*{6889807121034779922}^0001^<SctpTransport>    DcSctp library posted a fatal error 5 with message User-Initiated Abort, reason=Close called
+(E)[2026-09-23 15:08:38,768]=15:08:38=*00000*{6889807121034779922}^0001^<DtlsTransport>    DTLS close alert received.
+(E)[2026-09-23 15:08:38,777]=15:08:38=*26455*{6466933351539423280}^0001^<ClientControl>    ChannelId: 65535 is invalid. Failed to send command: 267
+(E)[2026-09-23 15:08:38,777]=15:08:38=*00000*{6466933351539423280}^0001^<RemoteInputHandl> Failed to send haptics data
+(E)[2026-09-23 15:08:38,779]=15:08:38=*00000*{6156154257712647646}^0001^<PeerConnector>    Unregister: Peer is not present in the peer map: Peer is null, assigned ID: 2.
+(M)[2026-09-23 15:08:38,800]=15:08:38=*27753*{1861841682106695652}^0001^<VideoStreamer>    Perform video streaming is done. stream:0 Actual frames:571. Frame Number 571
+(M)[2026-09-23 15:08:38,800]=15:08:38=*00000*{1861841682106695652}^0001^<FrameProcessor>   Stream:0 Finished with status STATUS_RUNNING after capturing 572 frames.
+(M)[2026-09-23 15:08:38,800]=15:08:38=*00000*{1861841682106695652}^0001^<AdapterContext>   GPU memory usage: used = 42075.437500, free = 6435.500000 MB, total = 48510.937500 MB
+(W)[2026-09-23 15:08:38,800]=15:08:38=*00000*{1861841682106695652}^0001^<NvEnc12VideoEnco> Failed to allocate completion event for end of input stream
+(E)[2026-09-23 15:08:38,824]=15:08:38=*00046*{6466933351539423280}^0001^<ClientControl>    ChannelId: 65535 is invalid. Failed to send command: 267
+(E)[2026-09-23 15:08:38,824]=15:08:38=*00000*{6466933351539423280}^0001^<RemoteInputHandl> Failed to send haptics data
+(E)[2026-09-23 15:08:38,824]=15:08:38=*00000*{6466933351539423280}^0001^<FrameProcessor>   Frame Processor not ready
+(E)[2026-09-23 15:08:38,827]=15:08:38=*00027*{1861841682106695652}^0001^<VFrameResCuda>    Trying to release an external pointer.
+(M)[2026-09-23 15:08:38,828]=15:08:38=*00000*{1861841682106695652}^0001^<VideoStreamerThr> Stream:0 Streamer ended normally
+(E)[2026-09-23 15:08:38,829]=15:08:38=*28869*{15284184344657602007}^0001^<ClientControl>    Control channel operation canceled by a session event. Error: 80000013
+(E)[2026-09-23 15:08:38,829]=15:08:38=*00000*{9086759636248160987}^0001^<CudaUtils>        CUDA Driver API error: cuMemGetInfo() failed. CUresult: invalid device context[201]
+(W)[2026-09-23 15:08:38,829]=15:08:38=*00000*{9086759636248160987}^0001^<AdapterContext>   Unable to get CUDA memory information
+(E)[2026-09-23 15:08:38,829]=15:08:38=*00000*{9086759636248160987}^0001^<CudaStatsHandler> Cuda frame stats map size 2
+(W)[2026-09-23 15:08:38,829]=15:08:38=*00000*{9086759636248160987}^0001^<VideoFrameCtxt>   Couldn't find VideoFrameContext for this thread.
+(M)[2026-09-23 15:08:38,829]=15:08:38=*00000*{9086759636248160987}^0001^<NvscStreamingSes> Terminated ended intentionally with reason 0x0000
+(M)[2026-09-23 15:08:38,830]=15:08:38=*00000*{9086759636248160987}^0001^<GamepadChannelHa> RI gamepad_channel_v1 stats: m_highestSequenceNumber: 0, m_packetsLostCount: 0, m_packetsDroppedCount: 0, packetsLostPercent: 0.00, packetsDroppedPercent: 0.00
+(E)[2026-09-23 15:08:41,794]=15:08:41=*00000*{5381624458425729880}^0001^<SignalingRequest> I/O error: Broken pipe. Exiting...
+(M)[2026-09-23 15:08:41,892]=15:08:41=*66828*{95528358913769022}^0001^<Server>           Completed server destruction.
+(E)[2026-09-23 15:08:41,894]=15:08:41=*00000*{9973290641104805536}^0001^<RunSdkCommand>    nvstStopServer failed: StreamSdkException 800b1000 [NVST_R_INVALID_STATE] Cannot transition from current state (1000) to (1000)
+(E)[2026-09-23 15:08:41,894]=15:08:41=*00000*{9973290641104805536}^0001^<STREAM_SERVER>    Unexpected exception during API call 'nvstStopServer': StreamSdkException 800b1000 [NVST_R_INVALID_STATE] The server[1] has not yet been created.  Use nvstCreateServer().
+(E)[2026-09-23 15:08:41,894]=15:08:41=*00000*{9973290641104805536}^0001^<STREAM_SERVER>    Unexpected exception during API call 'nvstDestroyServer': StreamSdkException 800b1000 [NVST_R_INVALID_STATE] The server[1] has not yet been created.  Use nvstCreateServer().

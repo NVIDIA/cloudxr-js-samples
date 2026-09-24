@@ -1,0 +1,108 @@
+(M)[2026-09-23 15:11:17,099]=15:11:17=*00000*{5698525387409903565}^0001^<VersionDump>      Name: streamsdk-server
+(M)[2026-09-23 15:11:17,099]=15:11:17=*00000*{5698525387409903565}^0001^<VersionDump>      DVS Branch: unknown
+(M)[2026-09-23 15:11:17,099]=15:11:17=*00000*{5698525387409903565}^0001^<VersionDump>      DVS P4VirtualChangelist: 0
+(M)[2026-09-23 15:11:17,101]=15:11:17=*00002*{5698525387409903565}^0001^<Server>           Using: OpenSSL 3.5.7 9 Jun 2026
+(M)[2026-09-23 15:11:17,108]=15:11:17=*00007*{5698525387409903565}^0001^<Server>           RND is initialized
+(M)[2026-09-23 15:11:17,109]=15:11:17=*00000*{5698525387409903565}^0001^<Server>           --- FE:F2:11:28:99:77: 10.1.69.24 / unused
+(M)[2026-09-23 15:11:17,109]=15:11:17=*00000*{5698525387409903565}^0001^<Server>           --- FE:F2:11:28:99:77: 10.1.69.24 / unused
+(M)[2026-09-23 15:11:17,132]=15:11:17=*00023*{5698525387409903565}^0001^<NvEncUtil>        Computing SPS/PPS headers.
+(W)[2026-09-23 15:11:17,132]=15:11:17=*00000*{5698525387409903565}^0001^<VideoFrameCtxt>   Couldn't find VideoFrameContext for this thread.
+(M)[2026-09-23 15:11:17,132]=15:11:17=*00000*{5698525387409903565}^0001^<AdapterContext>   Initializing Adapter context
+(M)[2026-09-23 15:11:17,132]=15:11:17=*00000*{5698525387409903565}^0001^<AdapterContext>   Initialized context for adapter 0: 1280 x 720 @ 60.0 Hz
+(M)[2026-09-23 15:11:17,132]=15:11:17=*00000*{5698525387409903565}^0001^<AdapterContext>   System is NOT co-proc.
+(M)[2026-09-23 15:11:17,244]=15:11:17=*00111*{5698525387409903565}^0001^<AdapterContext>   GPU memory usage: used = 1356.125000, free = 47185.312500 MB, total = 48541.437500 MB
+(M)[2026-09-23 15:11:17,244]=15:11:17=*00000*{5698525387409903565}^0001^<AdapterContext>   Initialized CUDA for device 'NVIDIA A40' (SM 8.6) in compute mode 'CU_COMPUTEMODE_DEFAULT'.
+(M)[2026-09-23 15:11:17,244]=15:11:17=*00000*{5698525387409903565}^0001^<VideoEncoder>     Initializing NvEnc12VideoEncoder.
+(M)[2026-09-23 15:11:17,244]=15:11:17=*00000*{5698525387409903565}^0001^<NvEnc12VideoEnco> Using NvEnc header version 12.0.
+(W)[2026-09-23 15:11:17,374]=15:11:17=*00130*{5698525387409903565}^0001^<CodecStatics>     Failed to read the Av1Disable regkey (CONFIG_STATUS result = 1); using default value of 0.
+(W)[2026-09-23 15:11:17,374]=15:11:17=*00000*{5698525387409903565}^0001^<NvEncUtil>        Skipping unsupported/disallowed format.
+(W)[2026-09-23 15:11:17,382]=15:11:17=*00007*{5698525387409903565}^0001^<NvEncUtil>        Skipping unsupported/disallowed format.
+(W)[2026-09-23 15:11:17,390]=15:11:17=*00007*{5698525387409903565}^0001^<NvEncUtil>        Skipping unsupported/disallowed format.
+(W)[2026-09-23 15:11:17,398]=15:11:17=*00008*{5698525387409903565}^0001^<NvEncUtil>        Skipping unsupported/disallowed format.
+(W)[2026-09-23 15:11:17,406]=15:11:17=*00007*{5698525387409903565}^0001^<NvEncUtil>        Skipping unsupported/disallowed format.
+(W)[2026-09-23 15:11:17,413]=15:11:17=*00007*{5698525387409903565}^0001^<NvEncUtil>        Skipping unsupported/disallowed format.
+(M)[2026-09-23 15:11:17,413]=15:11:17=*00000*{5698525387409903565}^0001^<AdapterContext>   GPU memory usage: used = 1356.125000, free = 47185.312500 MB, total = 48541.437500 MB
+(W)[2026-09-23 15:11:17,477]=15:11:17=*00063*{5698525387409903565}^0001^<AsyncTraceReport> There are 7 unreported trace events. Likely due to setTracingInterface not called in AdapterContext
+(W)[2026-09-23 15:11:17,477]=15:11:17=*00000*{5698525387409903565}^0001^<VideoEncoder>     VideoEncoder was not deinitialized prior to destruction!
+(M)[2026-09-23 15:11:17,477]=15:11:17=*00000*{5698525387409903565}^0001^<NvEncUtil>        Finished computing SPS/PPS headers.
+(M)[2026-09-23 15:11:17,479]=15:11:17=*00000*{14145625094649064343}^0001^<Signaling>        Signaling server started.
+(M)[2026-09-23 15:11:44,284]=15:11:44=*26804*{14145625094649064343}^0001^<Server>           Server is now configuring.
+(W)[2026-09-23 15:11:44,817]=15:11:44=*00533*{14145625094649064343}^0001^<NvNetworkCommon>  Network Address To String: invalid parameters 0x77ffdc044ab0, 0x77ffdc044ad0, 48
+(W)[2026-09-23 15:11:44,817]=15:11:44=*00000*{14145625094649064343}^0001^<NattHolePunch>    Address: invalid is not valid
+(W)[2026-09-23 15:11:44,817]=15:11:44=*00000*{14145625094649064343}^0001^<NattHolePunch>    Add destination addresses failed since it is empty for port 47998.
+(W)[2026-09-23 15:11:44,822]=15:11:44=*00004*{14145625094649064343}^0001^<NattHolePunch>    Add destination addresses failed since it is empty for port 47998.
+(W)[2026-09-23 15:11:44,822]=15:11:44=*00000*{12428170019828359400}^0001^<BasicThread>      Thread 132 prioritization request was denied because this process is not running under an enhanced OS priority.
+(W)[2026-09-23 15:11:44,822]=15:11:44=*00000*{14145625094649064343}^0001^<NattHolePunch>    Add destination addresses failed since it is empty for port 47998.
+(W)[2026-09-23 15:11:44,823]=15:11:44=*00000*{14145625094649064343}^0001^<NattHolePunch>    PUBLIC_ENDPOINT_CANDIDATES flag set but endpoint not configured (address='', port=0)
+(W)[2026-09-23 15:11:44,826]=15:11:44=*00003*{12428170019828359400}^0001^<WebRtcTrans>      No sender for source id 2
+(M)[2026-09-23 15:11:44,826]=15:11:44=*00000*{12428170019828359400}^0001^<VideoStreamer>    Stream:0 Creating video streamer.
+(W)[2026-09-23 15:11:44,842]=15:11:44=*00000*{398446183674345696}^0001^<NvNetworkCommon>  Network Address To String: invalid parameters 0x77ffdc0901d8, 0x77ffdc0901f8, 48
+(E)[2026-09-23 15:11:44,844]=15:11:44=*00020*{14145625094649064343}^0001^<STREAM_SERVER>    Unexpected exception during API call 'nvstSetRemotePeerIceCandidate': StreamSdkException 800b1000 [NVST_R_INVALID_STATE] The server[2] has not yet been created.  Use nvstCreateServer().
+(M)[2026-09-23 15:11:44,905]=15:11:44=*00079*{12428170019828359400}^0001^<NvscStreamingSes> WebRtcTransport for audio has built-in encryption
+(M)[2026-09-23 15:11:44,905]=15:11:44=*00000*{12428170019828359400}^0001^<NvscStreamingSes> WebRtcTransport for mic has built-in encryption
+(M)[2026-09-23 15:11:44,905]=15:11:44=*00000*{12428170019828359400}^0001^<RtpAudioStreamer> Audio streaming using WebRtcTransport
+(M)[2026-09-23 15:11:44,905]=15:11:44=*00000*{12428170019828359400}^0001^<RtpAudioStreamer> Audio streamer parameters: m_packetDuration = 10, bitrate = 256000, channels = 2,     multimappingmode = 0, useVBR = 1
+(M)[2026-09-23 15:11:44,905]=15:11:44=*00000*{12428170019828359400}^0001^<RtpAudioStreamer> Enabling RED audio redundancy
+(M)[2026-09-23 15:11:44,905]=15:11:44=*00000*{12428170019828359400}^0001^<RtpAudioControll> Started audio session 0x0x77ffb41e8a30
+(W)[2026-09-23 15:11:44,905]=15:11:44=*00000*{12428170019828359400}^0001^<Observer>         Queued command: 0x00000111 for label: control_channel 
+(E)[2026-09-23 15:11:44,905]=15:11:44=*00000*{12428170019828359400}^0001^<NvBitstreamParse> Unsupported Video Codec 0
+(W)[2026-09-23 15:11:44,905]=15:11:44=*00000*{12428170019828359400}^0001^<VideoSender>      Client requested an unknown streaming format 4096x4032@90hz!  Results may be unpredictable.
+(M)[2026-09-23 15:11:44,907]=15:11:44=*00001*{12428170019828359400}^0001^<AdapterContext>   Initializing Adapter context
+(M)[2026-09-23 15:11:44,907]=15:11:44=*00000*{12428170019828359400}^0001^<AdapterContext>   Initialized context for adapter 0: 1280 x 720 @ 60.0 Hz
+(M)[2026-09-23 15:11:44,907]=15:11:44=*00000*{12428170019828359400}^0001^<AdapterContext>   System is NOT co-proc.
+(M)[2026-09-23 15:11:44,907]=15:11:44=*00000*{12428170019828359400}^0001^<AdapterContext>   GPU memory usage: used = 1217.000000, free = 47324.437500 MB, total = 48541.437500 MB
+(M)[2026-09-23 15:11:44,907]=15:11:44=*00000*{12428170019828359400}^0001^<AdapterContext>   Initialized CUDA for device 'NVIDIA A40' (SM 8.6) in compute mode 'CU_COMPUTEMODE_DEFAULT'.
+(M)[2026-09-23 15:11:44,907]=15:11:44=*00000*{12428170019828359400}^0001^<VideoEncoder>     Initializing NvEnc12VideoEncoder.
+(M)[2026-09-23 15:11:44,907]=15:11:44=*00000*{12428170019828359400}^0001^<NvEnc12VideoEnco> Using NvEnc header version 12.0.
+(W)[2026-09-23 15:11:44,914]=15:11:44=*00072*{398446183674345696}^0001^<SctpDCCTS>        OnBufferedAmountLow called with invalid streamId 0
+(W)[2026-09-23 15:11:44,916]=15:11:44=*00002*{398446183674345696}^0001^<SctpDCCTS>        OnBufferedAmountLow called with invalid streamId 2
+(W)[2026-09-23 15:11:44,917]=15:11:44=*00000*{398446183674345696}^0001^<SctpDCCTS>        OnBufferedAmountLow called with invalid streamId 4
+(M)[2026-09-23 15:11:44,920]=15:11:44=*00013*{12428170019828359400}^0001^<VideoEncoder>     The Color Space Mode being used is 2 (NVST_CSCM_LIMITED_YCBCR_BT709)
+(M)[2026-09-23 15:11:44,928]=15:11:44=*00007*{12428170019828359400}^0001^<NvEnc12VideoEnco> Max number of reference frames configured 1 for 4096x4032 at frame: 0
+(M)[2026-09-23 15:11:44,928]=15:11:44=*00000*{12428170019828359400}^0001^<NvEnc12VideoEnco> Stream:0 H264 video format selected
+(M)[2026-09-23 15:11:44,928]=15:11:44=*00000*{12428170019828359400}^0001^<NvEnc12VideoEnco> RateControl mode NV_ENC_PARAMS_RC_CBR is selected for 4032@90 at frame: 0
+(M)[2026-09-23 15:11:44,928]=15:11:44=*00000*{12428170019828359400}^0001^<NvEnc12VideoEnco> Multi pass encoding configured as NV_ENC_TWO_PASS_QUARTER_RESOLUTION at frame: 0
+(M)[2026-09-23 15:11:44,928]=15:11:44=*00000*{12428170019828359400}^0001^<NvEnc12VideoEnco> Multi-reference encoding is enabled
+(M)[2026-09-23 15:11:44,928]=15:11:44=*00000*{12428170019828359400}^0001^<NvEnc12VideoEnco> Encoder preset configured PRESET_LOW_LATENCY_HP
+(M)[2026-09-23 15:11:44,928]=15:11:44=*00000*{12428170019828359400}^0001^<NvEnc12VideoEnco> Encoder preset used PRESET_NVENC_P2
+(W)[2026-09-23 15:11:44,981]=15:11:44=*00053*{12428170019828359400}^0001^<VideoStreamer>    QoS status callback is not set for stream packed.
+(M)[2026-09-23 15:11:44,982]=15:11:44=*00000*{12428170019828359400}^0001^<VideoStreamer>    Windows version is non-Windows.
+(M)[2026-09-23 15:11:44,982]=15:11:44=*00000*{12428170019828359400}^0001^<VideoStreamer>    Stream:0 Created video streaming connection
+(M)[2026-09-23 15:11:45,234]=15:11:45=*00000*{3220393815685896446}^0001^<NvEnc12VideoEnco> Changing encoder resolution to 0 x 0.
+(M)[2026-09-23 15:11:45,253]=15:11:45=*00000*{15687022322301061205}^0001^<VideoStreamer>    Stream:0 Frame 1 is an I-Frame.
+(M)[2026-09-23 15:11:45,253]=15:11:45=*00000*{15687022322301061205}^0001^<VideoStreamer>    Server sent the first video frame to client for stream:0
+(M)[2026-09-23 15:11:45,253]=15:11:45=*00000*{15687022322301061205}^0001^<VideoStreamer>    stream:0 capture frame state is SDR
+(W)[2026-09-23 15:11:45,780]=15:11:45=*00527*{15687022322301061205}^0001^<BandwidthEstimat> [2] Frame interval is HIGH! This frame interval:263.466000, expected:32.091625
+(W)[2026-09-23 15:11:46,043]=15:11:46=*00263*{15687022322301061205}^0001^<BandwidthEstimat> [3] Frame interval is HIGH! This frame interval:263.566000, expected:46.558773
+(M)[2026-09-23 15:11:46,856]=15:11:46=*01621*{3220393815685896446}^0001^<NvEnc12VideoEnco> Changing encoder resolution to 4096 x 4032.
+(E)[2026-09-23 15:11:49,946]=15:11:49=*05101*{14145625094649064343}^0001^<STREAM_SERVER>    Unexpected exception during API call 'nvstTraceClientBlobStats': StreamSdkException 800b1000 [NVST_R_INVALID_STATE] The server[2] has not yet been created.  Use nvstCreateServer().
+(E)[2026-09-23 15:11:54,944]=15:11:54=*04997*{14145625094649064343}^0001^<STREAM_SERVER>    Unexpected exception during API call 'nvstTraceClientBlobStats': StreamSdkException 800b1000 [NVST_R_INVALID_STATE] The server[2] has not yet been created.  Use nvstCreateServer().
+(E)[2026-09-23 15:11:59,943]=15:11:59=*04999*{14145625094649064343}^0001^<STREAM_SERVER>    Unexpected exception during API call 'nvstTraceClientBlobStats': StreamSdkException 800b1000 [NVST_R_INVALID_STATE] The server[2] has not yet been created.  Use nvstCreateServer().
+(E)[2026-09-23 15:12:04,944]=15:12:04=*05000*{14145625094649064343}^0001^<STREAM_SERVER>    Unexpected exception during API call 'nvstTraceClientBlobStats': StreamSdkException 800b1000 [NVST_R_INVALID_STATE] The server[2] has not yet been created.  Use nvstCreateServer().
+(E)[2026-09-23 15:12:09,944]=15:12:09=*05000*{14145625094649064343}^0001^<STREAM_SERVER>    Unexpected exception during API call 'nvstTraceClientBlobStats': StreamSdkException 800b1000 [NVST_R_INVALID_STATE] The server[2] has not yet been created.  Use nvstCreateServer().
+(E)[2026-09-23 15:12:14,944]=15:12:14=*05000*{14145625094649064343}^0001^<STREAM_SERVER>    Unexpected exception during API call 'nvstTraceClientBlobStats': StreamSdkException 800b1000 [NVST_R_INVALID_STATE] The server[2] has not yet been created.  Use nvstCreateServer().
+(E)[2026-09-23 15:12:16,222]=15:12:16=*31304*{398446183674345696}^0001^<SctpTransport>    DcSctp library posted a fatal error 5 with message User-Initiated Abort, reason=Close called
+(E)[2026-09-23 15:12:16,222]=15:12:16=*00000*{398446183674345696}^0001^<DtlsTransport>    DTLS close alert received.
+(E)[2026-09-23 15:12:16,236]=15:12:16=*00000*{1271038160483315821}^0001^<PeerConnector>    Unregister: Peer is not present in the peer map: Peer is null, assigned ID: 2.
+(E)[2026-09-23 15:12:16,257]=15:12:16=*00000*{17141310510499885253}^0001^<ClientControl>    ChannelId: 65535 is invalid. Failed to send command: 267
+(E)[2026-09-23 15:12:16,258]=15:12:16=*00000*{17141310510499885253}^0001^<RemoteInputHandl> Failed to send haptics data
+(E)[2026-09-23 15:12:16,267]=15:12:16=*29411*{3220393815685896446}^0001^<ClientControl>    ChannelId: 65535 is invalid. Failed to send command: 267
+(E)[2026-09-23 15:12:16,267]=15:12:16=*00000*{3220393815685896446}^0001^<RemoteInputHandl> Failed to send haptics data
+(M)[2026-09-23 15:12:16,280]=15:12:16=*30237*{15687022322301061205}^0001^<VideoStreamer>    Perform video streaming is done. stream:0 Actual frames:620. Frame Number 620
+(M)[2026-09-23 15:12:16,281]=15:12:16=*00000*{15687022322301061205}^0001^<FrameProcessor>   Stream:0 Finished with status STATUS_RUNNING after capturing 621 frames.
+(M)[2026-09-23 15:12:16,281]=15:12:16=*00000*{15687022322301061205}^0001^<AdapterContext>   GPU memory usage: used = 36068.750000, free = 12472.687500 MB, total = 48541.437500 MB
+(W)[2026-09-23 15:12:16,281]=15:12:16=*00000*{15687022322301061205}^0001^<NvEnc12VideoEnco> Failed to allocate completion event for end of input stream
+(E)[2026-09-23 15:12:16,318]=15:12:16=*00037*{15687022322301061205}^0001^<VFrameResCuda>    Trying to release an external pointer.
+(M)[2026-09-23 15:12:16,321]=15:12:16=*00003*{15687022322301061205}^0001^<VideoStreamerThr> Stream:0 Streamer ended normally
+(E)[2026-09-23 15:12:16,322]=15:12:16=*00000*{14102858779010109343}^0001^<ClientControl>    Control channel operation canceled by a session event. Error: 80000013
+(E)[2026-09-23 15:12:16,322]=15:12:16=*00000*{7420800387958190673}^0001^<CudaUtils>        CUDA Driver API error: cuMemGetInfo() failed. CUresult: invalid device context[201]
+(W)[2026-09-23 15:12:16,322]=15:12:16=*00000*{7420800387958190673}^0001^<AdapterContext>   Unable to get CUDA memory information
+(E)[2026-09-23 15:12:16,322]=15:12:16=*00000*{7420800387958190673}^0001^<CudaStatsHandler> Cuda frame stats map size 2
+(W)[2026-09-23 15:12:16,323]=15:12:16=*00000*{7420800387958190673}^0001^<VideoFrameCtxt>   Couldn't find VideoFrameContext for this thread.
+(M)[2026-09-23 15:12:16,323]=15:12:16=*00000*{7420800387958190673}^0001^<NvscStreamingSes> Terminated ended intentionally with reason 0x0000
+(M)[2026-09-23 15:12:16,323]=15:12:16=*00000*{7420800387958190673}^0001^<GamepadChannelHa> RI gamepad_channel_v1 stats: m_highestSequenceNumber: 0, m_packetsLostCount: 0, m_packetsDroppedCount: 0, packetsLostPercent: 0.00, packetsDroppedPercent: 0.00
+(E)[2026-09-23 15:12:18,893]=15:12:18=*00000*{11553931186375925581}^0001^<SignalingRequest> I/O error: Broken pipe. Exiting...
+(M)[2026-09-23 15:12:18,998]=15:12:18=*61520*{5698525387409903565}^0001^<Server>           Completed server destruction.
+(E)[2026-09-23 15:12:18,998]=15:12:18=*00000*{14819629809296691859}^0001^<RunSdkCommand>    nvstStopServer failed: StreamSdkException 800b1000 [NVST_R_INVALID_STATE] Cannot transition from current state (1000) to (1000)
+(E)[2026-09-23 15:12:18,999]=15:12:18=*00000*{14819629809296691859}^0001^<RunSdkCommand>    nvstStopServer failed: StreamSdkException 800b1000 [NVST_R_INVALID_STATE] Cannot transition from current state (1000) to (1000)
+(M)[2026-09-23 15:12:18,999]=15:12:18=*00000*{14819629809296691859}^0001^<Server>           Completed server destruction.

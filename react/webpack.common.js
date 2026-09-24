@@ -69,7 +69,6 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     alias: {
-      '@helpers': path.resolve(__dirname, './helpers'),
       // If OVERRIDE_CLOUDXR_FILENAME is set (testing only), @nvidia/cloudxr resolves to that bundle
       // basename next to package main—not for production. See ../webpack-nvidia-cloudxr-alias.cjs.
       ...nvidiaCloudxrWebpackAlias(__dirname),
@@ -108,7 +107,6 @@ module.exports = {
               ...[
                 'meta-quest-touch-plus',
                 'meta-quest-touch-plus-v2',
-                'oculus-touch-v2',
                 'oculus-touch-v3',
                 'pico-4u',
                 'generic-hand',

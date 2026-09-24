@@ -34,8 +34,6 @@
  * back to the parent component through callback props.
  */
 
-import { PerformanceCanvasImage } from '@helpers/react/PerformanceCanvasImage';
-import { useXRButton } from '@helpers/react/useXRButton';
 import { ReadonlySignal } from '@preact/signals-react';
 import { useFrame } from '@react-three/fiber';
 import { Handle, HandleTarget } from '@react-three/handle';
@@ -45,11 +43,15 @@ import React, { useRef, useEffect } from 'react';
 import { Color, Euler, Group, Mesh, MeshStandardMaterial, Quaternion, Vector3 } from 'three';
 import { damp } from 'three/src/math/MathUtils.js';
 
+import { PerformanceCanvasImage } from './components/PerformanceCanvasImage';
+import { useXRButton } from './hooks/useXRButton';
+
 const FACE_CAMERA_DAMPING = 10;
 
 const METRIC_SLOT_WIDTH = 512;
-const METRIC_SLOT_HEIGHT = 250;
+const METRIC_SLOT_HEIGHT = 380;
 
+/** Props for the in-XR CloudXR control and metrics panel. */
 interface CloudXRUIProps {
   onAction1?: () => void;
   onAction2?: () => void;
@@ -57,8 +59,12 @@ interface CloudXRUIProps {
   serverAddress?: string;
   sessionStatus?: string;
   renderFpsText?: ReadonlySignal<string>;
+  poseSendFpsText?: ReadonlySignal<string>;
   streamingFpsText?: ReadonlySignal<string>;
   poseToRenderText?: ReadonlySignal<string>;
+  sessionQuality?: ReadonlySignal<number>;
+  streamTestText?: ReadonlySignal<string>;
+  streamTestColor?: ReadonlySignal<string>;
   position?: [number, number, number];
   rotation?: [number, number, number];
 }
@@ -73,6 +79,11 @@ const zAxis = new Vector3(0, 0, 1);
 const HANDLE_COLOR_DEFAULT = new Color('#666666');
 const HANDLE_COLOR_HOVER = new Color('#aaaaaa');
 
+/**
+ * Renders the CloudXR in-XR control panel and performance HUD.
+ * @param props - UI callbacks, status text, and reactive metric signals.
+ * @returns The 3D UI group attached to the XR scene.
+ */
 export default function CloudXR3DUI({
   onAction1,
   onAction2,
@@ -80,8 +91,12 @@ export default function CloudXR3DUI({
   serverAddress = '127.0.0.1',
   sessionStatus = 'Disconnected',
   renderFpsText,
+  poseSendFpsText,
   streamingFpsText,
   poseToRenderText,
+  sessionQuality,
+  streamTestText,
+  streamTestColor,
   position = [1.8, 1.75, -1.3],
   rotation = [0, -0.3, 0],
 }: CloudXRUIProps) {
@@ -215,8 +230,10 @@ export default function CloudXR3DUI({
                     width={METRIC_SLOT_WIDTH}
                     height={METRIC_SLOT_HEIGHT}
                     renderFpsText={renderFpsText}
+                    poseSendFpsText={poseSendFpsText}
                     streamingFpsText={streamingFpsText}
                     poseToRenderText={poseToRenderText}
+                    sessionQuality={sessionQuality}
                   />
                 </Container>
               </Container>
@@ -239,8 +256,12 @@ export default function CloudXR3DUI({
               <Text fontSize={48} color="white" textAlign="center" marginBottom={24}>
                 Server address: {serverAddress}
               </Text>
-              <Text fontSize={48} color="white" textAlign="center" marginBottom={48}>
+              <Text fontSize={48} color="white" textAlign="center" marginBottom={24}>
                 Session status: {sessionStatus}
+              </Text>
+              {/* Network test status - signals drive reactive text and traffic-light color. */}
+              <Text fontSize={48} color={streamTestColor} textAlign="center" marginBottom={48}>
+                {streamTestText}
               </Text>
 
               {/* Button Grid */}
