@@ -59,6 +59,21 @@ limitations under the License.
             }
         }
 
+        /*
+         * Emulated-AR passthrough (IWER on desktop): hide the 2D page chrome so
+         * the dark checkerboard backdrop (applied to <body> by the shared
+         * IWERBackground helper) fills the entire viewport behind the streamed
+         * XR content. The canvas, exit button, and IWER DevUI overlays are
+         * body-level siblings and stay visible. main.ts only adds the
+         * iwer-ar-background class for AR sessions, so this is a no-op on real
+         * headsets and in VR.
+         */
+        body.iwer-ar-background .top-banner,
+        body.iwer-ar-background header,
+        body.iwer-ar-background main {
+            display: none !important;
+        }
+
         /* Top Banner */
         .top-banner {
             width: 100vw;
@@ -358,7 +373,7 @@ limitations under the License.
             border-radius: 4px;
             padding: 10px 12px;
             margin-top: 8px;
-            color: #8a6d3b;
+            color: #664d03;
             font-size: 0.85rem;
             line-height: 1.4;
         }
@@ -368,7 +383,7 @@ limitations under the License.
             position: fixed;
             top: 20px;
             right: 20px;
-            background: #ff3300cc;
+            background: #cc2200;
             color: white;
             border: none;
             border-radius: 5px;
@@ -566,6 +581,11 @@ limitations under the License.
                     <option value="ar" selected>AR Immersive</option>
                     <option value="vr">VR Immersive</option>
                 </select>
+                <label for="micEnabled" class="input-label">Microphone</label>
+                <select id="micEnabled" name="micEnabled" class="ui-input" aria-label="Microphone upstream">
+                    <option value="true" selected>Enabled (upstream audio)</option>
+                    <option value="false">Disabled</option>
+                </select>
             </form>
         </aside>
 
@@ -609,6 +629,14 @@ limitations under the License.
             </div>
 
             <div class="config-section">
+                <label for="clientToken" class="input-label">Client Token (Optional)</label>
+                <input id="clientToken" class="ui-input config-input" type="password" placeholder="e.g., eyJhbGciOiJIUzI1NiIsIn..." spellcheck="false" autocapitalize="off" autocomplete="off">
+                <div class="config-text">
+                    Per-session token used to authenticate the connection. Leave empty if the server does not require a token.
+                </div>
+            </div>
+
+            <div class="config-section">
                 <label class="input-label">Frame Rate Configuration</label>
                 <label for="deviceFrameRate" class="input-label">Device Frame Rate</label>
                 <select id="deviceFrameRate" class="ui-input config-input">
@@ -625,12 +653,10 @@ limitations under the License.
                 <label class="input-label">Maximum Streaming Bitrate</label>
                 <label for="maxStreamingBitrateMbps" class="input-label">Megabits per second</label>
                 <select id="maxStreamingBitrateMbps" class="ui-input config-input">
+                    <option value="10">10 Mbps</option>
+                    <option value="50">50 Mbps</option>
                     <option value="80">80 Mbps</option>
-                    <option value="100">100 Mbps</option>
-                    <option value="120">120 Mbps</option>
-                    <option value="150" selected>150 Mbps</option>
-                    <option value="180">180 Mbps</option>
-                    <option value="200">200 Mbps</option>
+                    <option value="100" selected>100 Mbps</option>
                 </select>
                 <div class="config-text">
                     Select the maximum streaming bitrate (in Megabits per second) for the XR session
@@ -641,9 +667,10 @@ limitations under the License.
                 <label class="input-label">Codec Selection</label>
                 <label for="codec" class="input-label">Video Codec</label>
                 <select id="codec" class="ui-input config-input">
-                    <option value="h264">H.264</option>
+                    <option value="auto" selected>Auto (AV1 → H.265 → H.264)</option>
+                    <option value="av1">AV1</option>
                     <option value="h265">H.265 (HEVC)</option>
-                    <option value="av1" selected>AV1</option>
+                    <option value="h264">H.264</option>
                 </select>
                 <div class="config-text">
                     Select the preferred streaming codec. Availability depends on browser and server support.

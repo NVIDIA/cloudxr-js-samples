@@ -1,0 +1,790 @@
+/*
+ * SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
+ * CloudXR.js Metrics Hub — layout and component styles (NVIDIA green / light theme).
+ */
+
+/* --- Design tokens --- */
+:root {
+  --primary-green: #76b900;
+  --border-color: #e0e0e0;
+  --text-main: #111;
+  --text-muted: #666;
+  --background-main: #fff;
+  --background-section: #f8f8f8;
+  --input-radius: 0;
+  --input-border: 2px solid var(--border-color);
+}
+
+/* --- Global reset and page shell --- */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--background-main);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Header --- */
+.top-banner {
+  width: 100%;
+  height: 8px;
+  background: var(--primary-green);
+}
+
+header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.header-subtitle {
+  margin: 0.35rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  max-width: 42rem;
+}
+
+code {
+  font-family: 'Courier New', ui-monospace, monospace;
+  font-size: 0.88em;
+  background: #f0f0f0;
+  padding: 0.1em 0.35em;
+}
+
+/* --- Two-column layout (aside + main) --- */
+main {
+  display: flex;
+  height: calc(100vh - 73px);
+}
+
+aside {
+  width: 400px;
+  min-width: 320px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+}
+
+section {
+  flex: 1;
+  padding: 32px;
+  background: var(--background-section);
+  overflow-y: auto;
+}
+
+/* --- Section headings --- */
+.settings-title,
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 24px 0 12px;
+}
+
+.settings-title:first-of-type {
+  margin-top: 8px;
+}
+
+.section-title {
+  margin-top: 0;
+}
+
+.section-hint {
+  margin: -4px 0 16px;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+/* --- Connection form controls --- */
+.input-label {
+  display: block;
+  font-size: 0.92rem;
+  color: #444;
+  margin-bottom: 5px;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+.ui-input {
+  width: 100%;
+  padding: 14px 12px;
+  font-size: 1rem;
+  border: var(--input-border);
+  border-radius: var(--input-radius);
+  background: var(--background-main);
+  min-height: 48px;
+}
+
+.ui-input:focus {
+  outline: none;
+  border-color: var(--primary-green);
+  box-shadow: 0 0 0 3px rgba(118, 185, 0, 0.2);
+}
+
+.connect-button {
+  width: 100%;
+  margin-top: 16px;
+  background: var(--primary-green);
+  color: #000;
+  border: none;
+  border-radius: var(--input-radius);
+  padding: 14px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-height: 52px;
+}
+
+.connect-button:hover {
+  background: #8ac800;
+}
+
+/* --- WebSocket status banner --- */
+.status-message-box {
+  padding: 12px 14px;
+  border: 2px solid var(--border-color);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.status-message-box.status-on {
+  border-color: var(--primary-green);
+  background: #edf7d6;
+  color: #3d5a00;
+}
+
+.status-message-box.status-off {
+  color: var(--text-muted);
+}
+
+/* --- OOB connectivity diagnostic banners --- */
+.connectivity-alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.connectivity-alerts[hidden] {
+  display: none;
+}
+
+.connectivity-alert {
+  padding: 10px 12px;
+  border: 2px solid #c0392b;
+  background: #fde8e8;
+  color: #5c1a1a;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.connectivity-alert--warning {
+  border-color: #d68910;
+  background: #fef5e7;
+  color: #6e4b00;
+}
+
+.connectivity-alert strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.92rem;
+}
+
+/* --- Headset sidebar cards --- */
+.headset-list {
+  flex: 1;
+  min-height: 4rem;
+}
+
+.headset-card {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.headset-card:last-child {
+  border-bottom: none;
+}
+
+.headset-title {
+  font-weight: 600;
+}
+
+.headset-meta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.muted {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* --- Metrics charts (uPlot panels) --- */
+.metrics-root {
+  min-height: 12rem;
+}
+
+.metrics-headset h3 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.metric-chart-host {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.metric-chart-panel {
+  background: var(--background-main);
+  border: 1px solid var(--border-color);
+  padding: 12px 14px 8px;
+}
+
+.metric-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.legend-value {
+  color: var(--text-main);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-chart-plot {
+  width: 100%;
+  min-height: 220px;
+}
+
+.metric-chart-plot .uplot {
+  font-family: inherit;
+}
+
+/* --- Metric picker (checkbox grid) --- */
+.metric-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  background: var(--background-main);
+  border: 1px solid var(--border-color);
+}
+
+.metric-picker-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.metric-picker-toolbar button {
+  border: 1px solid var(--border-color);
+  background: #fff;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.metric-picker-toolbar button:hover {
+  border-color: var(--primary-green);
+}
+
+.metric-picker-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px 20px;
+}
+
+.metric-picker-group h4 {
+  margin: 0 0 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #444;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metric-picker-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: var(--text-main);
+  margin: 4px 0;
+  cursor: pointer;
+}
+
+.metric-picker-option input {
+  margin-top: 2px;
+  accent-color: var(--primary-green);
+}
+
+.metric-picker-option span {
+  line-height: 1.3;
+}
+
+.metric-picker-unit {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+/* --- Activity log panel --- */
+.log {
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--background-main);
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  font-family: 'Courier New', ui-monospace, monospace;
+  font-size: 0.82rem;
+}
+
+.log-line {
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.log-line:last-child {
+  border-bottom: none;
+}
+
+.log-debug {
+  color: var(--text-muted);
+}
+
+.log-warn {
+  color: #7d4e00;
+}
+
+.log-error {
+  color: #c0392b;
+}
+
+/* --- Headset log panel (forwarded SDK logs) --- */
+.headset-log-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 10px;
+  font-size: 0.88rem;
+}
+
+.log-level-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.log-level-label input {
+  accent-color: var(--primary-green);
+}
+
+.log-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-family: 'Courier New', ui-monospace, monospace;
+}
+
+.log-badge-error {
+  background: #fde8e8;
+  color: #c0392b;
+}
+.log-badge-warning {
+  background: #fef3cd;
+  color: #7d4e00;
+}
+.log-badge-info {
+  background: #e8f0fe;
+  color: #1a56db;
+}
+.log-badge-debug {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.log-clear-btn {
+  margin-left: auto;
+  border: 1px solid var(--border-color);
+  background: #fff;
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.log-clear-btn:hover {
+  border-color: var(--primary-green);
+}
+
+.headset-log {
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--background-main);
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  font-family: 'Courier New', ui-monospace, monospace;
+  font-size: 0.82rem;
+  margin-bottom: 20px;
+}
+
+.headset-log-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 0;
+  border-bottom: 1px solid #eee;
+  flex-wrap: wrap;
+}
+
+.headset-log-line:last-child {
+  border-bottom: none;
+}
+
+.log-source {
+  color: #555;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.log-msg {
+  flex: 1;
+  overflow-wrap: break-word;
+}
+
+.log-ts {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+}
+
+.section-link {
+  font-size: 0.8rem;
+  font-weight: 400;
+  margin-left: 10px;
+  color: var(--primary-green);
+  text-decoration: none;
+}
+
+.section-link:hover {
+  text-decoration: underline;
+}
+
+/* --- Footer help text --- */
+.help {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.help p {
+  margin: 6px 0;
+}
+
+/* --- HeadsetLogPanel (hsl-*) ------------------------------------------------ */
+
+/* Outer wrapper — flex column so the toolbar sits above the scrollable log. */
+.hsl-panel {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+}
+
+/* On the dedicated logs page the panel grows to fill the available section height. */
+.hsl-panel--tall .hsl-log {
+  max-height: calc(100vh - 340px);
+  min-height: 280px;
+}
+
+/* Toolbar strip — horizontal flex, wraps on narrow viewports. */
+.hsl-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 0;
+  padding: 6px 10px;
+  background: #f7f7f7;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.84rem;
+}
+
+/* Group of related controls (e.g. level checkboxes or action buttons). */
+.hsl-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Thin vertical rule between toolbar sections. */
+.hsl-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--border-color);
+  margin: 0 8px;
+  flex-shrink: 0;
+}
+
+/* Level checkbox + badge labels. */
+.hsl-level-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.hsl-level-label input {
+  accent-color: var(--primary-green);
+  margin: 0;
+}
+
+/* Search box + match count wrapper. */
+.hsl-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Search input — stretches to fill available space up to a sensible max. */
+.hsl-search {
+  width: 200px;
+  max-width: 300px;
+  padding: 3px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  font-size: 0.84rem;
+  font-family: inherit;
+  background: #fff;
+  outline-offset: 1px;
+}
+
+.hsl-search:focus {
+  border-color: var(--primary-green);
+  outline: none;
+}
+
+/* Red tint when the search term matches nothing. */
+.hsl-search.hsl-search-no-match {
+  border-color: #c0392b;
+  background: #fff5f5;
+}
+
+/* Small match count label next to the search box. */
+.hsl-match-count {
+  font-size: 0.78rem;
+  white-space: nowrap;
+  min-width: 4ch;
+}
+
+/* Headset source filter dropdown. */
+.hsl-source-select {
+  padding: 3px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  font-size: 0.84rem;
+  font-family: inherit;
+  background: #fff;
+  cursor: pointer;
+  max-width: 180px;
+}
+
+.hsl-source-select:focus {
+  border-color: var(--primary-green);
+  outline: none;
+}
+
+/* Toolbar action buttons (Clear, ⬇ JSON, ⬇ .log). */
+.hsl-btn {
+  padding: 3px 9px;
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  background: #fff;
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.hsl-btn:hover {
+  border-color: var(--primary-green);
+}
+
+/* Entry count badge — pushed to the right by margin-left: auto. */
+.hsl-count {
+  margin-left: auto;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+/* Scrollable log area — fixed height with a thin custom scrollbar. */
+.hsl-log {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 320px;
+  padding: 6px 12px;
+  background: var(--background-main);
+  font-family: 'Courier New', ui-monospace, monospace;
+  font-size: 0.82rem;
+  /* Thin scrollbar on Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #bbb #f0f0f0;
+}
+
+/* Thin scrollbar on Chromium */
+.hsl-log::-webkit-scrollbar {
+  width: 6px;
+}
+
+.hsl-log::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+
+.hsl-log::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 3px;
+}
+
+.hsl-log::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+/* One log entry row. */
+.hsl-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 0;
+  border-bottom: 1px solid #eee;
+  flex-wrap: wrap;
+}
+
+.hsl-row:last-child {
+  border-bottom: none;
+}
+
+/* Subtle left accent by log level. */
+.hsl-row-error {
+  border-left: 2px solid #c0392b;
+  padding-left: 6px;
+}
+.hsl-row-warning {
+  border-left: 2px solid #f0a020;
+  padding-left: 6px;
+}
+.hsl-row-info {
+  border-left: 2px solid #1a56db;
+  padding-left: 6px;
+}
+.hsl-row-debug {
+  border-left: 2px solid #aaa;
+  padding-left: 6px;
+}
+
+/* Timestamp column. */
+.hsl-ts {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+}
+
+/* Level badge — shares styles with .log-badge / .log-badge-* from hub.css. */
+.hsl-badge {
+  flex-shrink: 0;
+}
+
+/* Source (headset) label. */
+.hsl-source {
+  color: #555;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* Message text — grows to fill remaining space and wraps on long lines. */
+.hsl-msg {
+  flex: 1;
+  overflow-wrap: break-word;
+}
+
+/* Search match highlight — yellow, same palette as browser Find. */
+.hsl-hi {
+  background: #ffef00;
+  color: #000;
+  border-radius: 1px;
+  padding: 0 1px;
+}
+
+/* --- Responsive: stack aside above main on narrow viewports --- */
+@media (max-width: 900px) {
+  main {
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 73px);
+  }
+
+  html,
+  body {
+    overflow: auto;
+  }
+
+  aside {
+    width: 100%;
+    min-width: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  section {
+    padding: 24px 16px;
+  }
+}

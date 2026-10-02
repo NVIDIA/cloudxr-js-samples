@@ -7,6 +7,7 @@ For comprehensive documentation, see the [NVIDIA CloudXR SDK documentation](http
 - **CloudXR.js SDK** - a JavaScript client library
 - **WebGL-based simple sample client** that uses core Web APIs (WebGL, WebXR)
 - **React-based sample client** that uses the R3F (React-Three-Fiber) framework stack
+- **Metrics hub** for local monitoring and diagnostics
 
 ## Architecture
 

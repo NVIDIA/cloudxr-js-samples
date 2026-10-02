@@ -5,6 +5,9 @@ description: Build WebXR streaming clients with NVIDIA CloudXR.js SDK. Use when 
 
 # NVIDIA CloudXR.js SDK
 
+> **Applies to:** AI coding assistants helping users build WebXR apps with `@nvidia/cloudxr`. This is the lean coding-focused quick reference.
+> **Read this when:** Scaffolding a new client, generating minimal integration code, or wiring up basic Session lifecycle. For detailed types, see [agent-api-reference.md](agent-api-reference.md).
+
 CloudXR.js streams XR content from a GPU server to a web browser. The server renders; the client displays video and sends back head/hand tracking. Think "Netflix for VR."
 
 ## Quick Start
@@ -92,15 +95,27 @@ session.disconnect();
 | ---------------------------- | -------------- | -------------------------------------------- |
 | `codec`                      | `'h264'`       | Also `'av1'`                                 |
 | `deviceFrameRate`            | device default | e.g. `72`, `90`                              |
-| `maxStreamingBitrateKbps`    | SDK default    | e.g. `150000`                                |
+| `maxStreamingBitrateKbps`    | `100000`       | Greater than `0` and at most `100000`        |
 | `enablePoseSmoothing`        | —              | Smooth head tracking                         |
 | `posePredictionFactor`       | —              | Prediction multiplier                        |
 | `mediaAddress` / `mediaPort` | —              | NAT traversal                                |
 | `signalingResourcePath`      | —              | Proxy routing path                           |
-| `signalingQueryParameters`   | —              | Auth tokens, etc.                            |
+| `signalingQueryParameters`   | —              | Extra signaling URL parameters               |
+| `signalingHeaders`           | —              | Additional signaling handshake headers       |
 | `iceServers`                 | —              | STUN/TURN for enterprise NAT                 |
 | `glBinding`                  | —              | `XRWebGLBinding` for R3F                     |
 | `telemetry`                  | —              | `{ enabled, appInfo: { version, product } }` |
+
+## CloudXR.js Metrics Hub (optional, react/src/metrics)
+
+When a deployment runs a control hub (`hub`) at `/oob/v1/ws`, the headset client can opt in via URL query:
+
+- `oobEnable=1`, `serverIP`, `hubPort` — opens `MetricsHubChannel` (see `metricsHubChannel.ts`); hub host = CloudXR Server IP, `hubPort` defaults to 8787 (distinct from `port`, which seeds CloudXR signaling)
+- The hub WebSocket scheme follows the page: `wss://` on HTTPS, `ws://` on HTTP
+- `controlToken` — optional auth on register
+- Stream seeds: `parseStreamUrlSeeds()` → pass to `CloudXR2DUI.initialize(urlSeeds)`
+
+The **react** sample wires this through `useMetricsHubChannel`. For local metrics testing, run the hub in `hub` and connect with `?oobEnable=1`.
 
 ## Resolution Rules
 
@@ -127,7 +142,7 @@ See the [React sample](https://github.com/NVIDIA/cloudxr-js-samples/tree/main/re
 import * as CloudXR from '@nvidia/cloudxr';
 import { useThree, useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
-import { bindGL } from '@helpers/WebGLStateBinding';
+import { bindGL } from './cloudxr/WebGLStateBinding';
 
 function CloudXRComponent({ config }) {
   const gl = useThree().gl.getContext() as WebGL2RenderingContext;
@@ -149,7 +164,7 @@ function CloudXRComponent({ config }) {
 }
 ```
 
-Critical R3F detail: set `threeRenderer.autoClear = false` so Three.js doesn't clear the framebuffer after CloudXR renders. Use `bindGL()` from helpers to save/restore WebGL state around CloudXR calls.
+Critical R3F detail: set `threeRenderer.autoClear = false` so Three.js doesn't clear the framebuffer after CloudXR renders. The React sample keeps `bindGL()` and its state tracker under `src/cloudxr/`.
 
 ## Error Handling
 
