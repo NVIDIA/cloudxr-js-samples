@@ -1,0 +1,11 @@
+{
+  "session": "2026-10-07T033303Z",
+  "timestampUtc": "2026-10-07T03:33:03+00:00",
+  "dir": "session_2026-10-07T033303Z",
+  "logs": [
+    "cxr_streamsdk.2026-10-07T033303Z.000.log"
+  ],
+  "etls": [
+    "NvStreamer-20261007-033343.etli"
+  ]
+}

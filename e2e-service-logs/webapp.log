@@ -1,0 +1,32 @@
+total 9756
+drwxr-xr-x 3 root root    4096 Oct  7 03:33 .
+drwxrwxrwx 5 root root    4096 Oct  7 03:34 ..
+-rw-r--r-- 1 root root   97888 Oct  7 03:33 127.bundle.js
+-rw-r--r-- 1 root root 1356818 Oct  7 03:33 363.bundle.js
+-rw-r--r-- 1 root root    1863 Oct  7 03:33 363.bundle.js.LICENSE.txt
+-rw-r--r-- 1 root root  423367 Oct  7 03:33 372.bundle.js
+-rw-r--r-- 1 root root  548748 Oct  7 03:33 455.bundle.js
+-rw-r--r-- 1 root root  409920 Oct  7 03:33 482.bundle.js
+-rw-r--r-- 1 root root 1500442 Oct  7 03:33 544.bundle.js
+-rw-r--r-- 1 root root 2087336 Oct  7 03:33 708.bundle.js
+-rw-r--r-- 1 root root    1071 Oct  7 03:33 HEROICONS_LICENSE
+-rw-r--r-- 1 root root     556 Oct  7 03:33 arrow-left-start-on-rectangle.svg
+-rw-r--r-- 1 root root     380 Oct  7 03:33 arrow-uturn-left.svg
+-rw-r--r-- 1 root root 3465847 Oct  7 03:33 bundle.js
+-rw-r--r-- 1 root root    2371 Oct  7 03:33 bundle.js.LICENSE.txt
+-rw-r--r-- 1 root root     435 Oct  7 03:33 controller-icons.svg
+-rw-r--r-- 1 root root   14224 Oct  7 03:33 favicon.ico
+-rw-r--r-- 1 root root   17636 Oct  7 03:33 index.html
+drwxr-xr-x 3 root root    4096 Oct  7 03:33 npm
+-rw-r--r-- 1 root root     402 Oct  7 03:33 play-circle.svg
+-rw-r--r-- 1 root root     430 Oct  7 03:33 stop-circle.svg
+127.0.0.1 - - [07/Oct/2026 03:36:26] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 03:36:39] "GET /?oobEnable=1&hubPort=8787 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 03:36:39] "GET /bundle.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 03:36:40] "GET /favicon.ico HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 03:36:40] "GET /372.bundle.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 03:36:40] "GET /arrow-left-start-on-rectangle.svg HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 03:36:42] "GET /npm/@webxr-input-profiles/assets@1.0.20/dist/profiles/profilesList.json HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 03:36:42] "GET /npm/@webxr-input-profiles/assets@1.0.20/dist/profiles/meta-quest-touch-plus/profile.json HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 03:36:42] "GET /npm/@webxr-input-profiles/assets@1.0.20/dist/profiles/meta-quest-touch-plus/left.glb HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 03:36:42] "GET /npm/@webxr-input-profiles/assets@1.0.20/dist/profiles/meta-quest-touch-plus/right.glb HTTP/1.1" 200 -

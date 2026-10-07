@@ -159,7 +159,11 @@ Renders the in-VR user interface:
 react/
 ├── src/
 │   ├── App.tsx              # Main React application
-│   ├── CloudXRComponent.tsx # CloudXR streaming component
+│   ├── cloudxr/             # Streaming component and WebGL state isolation
+│   ├── components/          # Reusable React UI components
+│   ├── hooks/               # Sample-local React hooks
+│   ├── metrics/             # Metrics hub client and buffering
+│   ├── utils/               # Browser, device, and form utilities
 │   ├── CloudXR2DUI.tsx      # 2D UI management class
 │   ├── CloudXRUI.tsx        # 3D VR UI component
 │   ├── index.tsx            # React app entry point
@@ -242,9 +246,9 @@ The 3D UI uses React Three UIKit for modern VR/AR interfaces:
 
 ### WebGL State Tracking
 
-This example uses WebGL state tracking to prevent rendering conflicts between React Three Fiber and CloudXR. Both libraries render to the same WebGL context, but CloudXR's rendering operations modify WebGL state (framebuffers, textures, buffers, VAOs, shaders, blend modes, etc.) which can interfere with React Three Fiber's expectations. The example wraps the WebGL context with `bindGL()` from `@helpers/WebGLStateBinding`, then uses CloudXR's `onWebGLStateChangeBegin` and `onWebGLStateChangeEnd` callbacks to automatically save and restore state around CloudXR's rendering. This ensures React Three Fiber always finds the WebGL context in the expected state after each CloudXR render operation.
+This example uses WebGL state tracking to prevent rendering conflicts between React Three Fiber and CloudXR. Both libraries render to the same WebGL context, but CloudXR's rendering operations modify WebGL state (framebuffers, textures, buffers, VAOs, shaders, blend modes, etc.) which can interfere with React Three Fiber's expectations. The example wraps the WebGL context with `bindGL()` from `src/cloudxr/WebGLStateBinding.ts`, then uses CloudXR's `onWebGLStateChangeBegin` and `onWebGLStateChangeEnd` callbacks to automatically save and restore state around CloudXR's rendering. This ensures React Three Fiber always finds the WebGL context in the expected state after each CloudXR render operation.
 
-See `examples/helpers/WebGLStateBinding.ts`, `WebGLState.ts`, and `WebGLStateApply.ts` for implementation details. Comprehensive tests are available in `tests/unit/WebGLState.test.ts` and `tests/playwright/WebGLTests/src/WebGLStateBindingTests.ts`.
+See `src/cloudxr/WebGLStateBinding.ts`, `WebGLState.ts`, and `WebGLStateApply.ts` for implementation details. Comprehensive tests are available under `tests/unit/webgl-state/` and in `tests/playwright/WebGLTests/src/WebGLStateBindingTests.ts`.
 
 ## Documentation
 

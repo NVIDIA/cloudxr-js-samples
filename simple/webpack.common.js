@@ -43,7 +43,6 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
     alias: {
-      '@helpers': path.resolve(__dirname, './helpers'),
       // If OVERRIDE_CLOUDXR_FILENAME is set (testing only), @nvidia/cloudxr resolves to that bundle
       // basename next to package main—not for production. See ../webpack-nvidia-cloudxr-alias.cjs.
       ...nvidiaCloudxrWebpackAlias(__dirname),

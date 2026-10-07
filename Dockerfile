@@ -19,7 +19,7 @@
 
 FROM node:24-slim AS builder
 
-# Build argument to specify which example to build (simple, react, or isaac)
+# Build argument to specify which client example to build (simple or react)
 ARG EXAMPLE_NAME=simple
 
 WORKDIR /app
@@ -36,7 +36,8 @@ RUN npm install ./cloudxr-sdk.tgz && \
     npm install && \
     npm run build
 
-# Production stage - serve built files with nginx
+# Production stage - serve built files with nginx.
+# nginx requires root to bind port 80; acceptable for this demo image.
 FROM nginx:alpine
 
 # Build argument (passed from builder stage)

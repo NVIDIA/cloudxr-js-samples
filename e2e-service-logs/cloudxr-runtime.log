@@ -1,0 +1,857 @@
+Executable path:	/app/lovr
+Executable directory:	/app/
+Runtime JSON path:	/app/openxr_cloudxr.json
+Could not load module "audio": Failed to initialize miniaudio context: No backend
+NVIDIA CloudXR Plugin Example
+Loading CloudXR manager...
+Flag enabled:	headless
+Option set:	device-profile=auto-webrtc
+Loading NVIDIA CloudXR Runtime plugin...
+NVIDIA CloudXR plugin loaded successfully
+ INFO [logServiceInfo] Created CloudXR™ Service
+	version: 6.3.0
+	tag: cloudxr-6.3.0-g7606129
+	outputDir: /builds/cloudxr-js-samples-e2e-473309084/raw
+	logFile: <DISABLED>
+	uses: Monado™
+ERROR [checkDeprecatedGpuIndexEnvVar] 
+################################################################################
+#                                                                              #
+#  NV_GPU_INDEX is deprecated and will be removed in a future release.         #
+#                                                                              #
+#  Use one of the following instead (only one may be set at a time):           #
+#                                                                              #
+#    NV_CXR_GPU_INDEX_VULKAN  - Select the Vulkan physical device by index     #
+#    NV_CXR_GPU_INDEX_CUDA    - Select the GPU by CUDA device index            #
+#                                                                              #
+#  These can also be set via the property API:                                 #
+#    gpu-index-vulkan / gpu-index-cuda                                         #
+#                                                                              #
+################################################################################
+ INFO [nv_cxr_service_create] Service object created successfully
+NVIDIA CloudXR plugin initialized
+CloudXR Library API Version: 1.0.7
+CloudXR Runtime Version: 6.3.0
+CloudXR device profile:	auto-webrtc
+ INFO [nv_cxr_service_start] Beginning runtime startup sequence
+ INFO [ipc_server_main_common] NVIDIA™ CloudXR™ Runtime 'cloudxr-6.3.0-g7606129' starting up...
+ INFO [print_settings_information] 
+################################################################################
+#                                                                              #
+#  Creating the runtime system with the following settings:                    #
+#                                                                              #
+#  immediateCompositor: true                                                   #
+#  deviceProfile: auto-webrtc                                                  #
+#  controllerEmulation: false                                                  #
+#  debugControllerBindings: false                                              #
+#  audioStreaming: true                                                        #
+#  audioDumping: false                                                         #
+#  audioQuality: auto                                                          #
+#  outputDir: /builds/cloudxr-js-samples-e2e-473309084/raw                     #
+#  endpointIP: <empty>                                                         #
+#  backendMode: nvst-webrtc                                                    #
+#  emptyFrameWidth: 512                                                        #
+#  emptyFrameHeight: 512                                                       #
+#  appPqwSubmitMode: warped                                                    #
+#  runtimeFoveation: false                                                     #
+#  dynamicFoveation: false                                                     #
+#  foveationBlur: false                                                        #
+#  stepLinearFoveation: false                                                  #
+#  foveationUnwarpedWidth: 0                                                   #
+#  foveationWarpedWidth: 0                                                     #
+#  foveationInset: 0                                                           #
+#  disableAlpha: false                                                         #
+#  packingMethod: packed-frame                                                 #
+#  usePartialRangeColor: true                                                  #
+#  disableDepthDilation: false                                                 #
+#  createCudaCtx: true                                                         #
+#  serverPort: 49100                                                           #
+#  mediaPort: 0                                                                #
+#  serverLogLevel: error                                                       #
+#  logMaxFileSize: 33554432                                                    #
+#  streamingBitsPerChannel: 8                                                  #
+#  maxFps: 0                                                                   #
+#  logForwarding: false                                                        #
+#  enableIce: true                                                             #
+#  enablePushDevices: false                                                    #
+#  stopOnStdIn: false                                                          #
+#  stopOnAppExit: false                                                        #
+#  gpuIndexVulkan: 0                                                           #
+#  gpuIndexCuda: -1                                                            #
+#                                                                              #
+################################################################################
+ INFO [createRuntimeSystem] Settings applied, now creating the runtime system and all sub-components
+ INFO [create] Entered RuntimeSystem::create, beginning sub-component initialization
+ INFO [create] Creating protocol translator for client communication
+ INFO [create] Protocol translator created
+ INFO [create] Creating device configuration from selected device profile
+ INFO [create] Device configuration deferred until client connects
+ INFO [create] Initializing runtime compositor (Vulkan context, GPU resources)
+ INFO [init] Picked Vulkan GPU with index: 0
+ INFO [vk_log_extension_list] Vulkan instance extensions list(s):
+	Enabled extensions:
+		VK_KHR_external_fence_capabilities        required
+		VK_KHR_external_memory_capabilities       required
+		VK_KHR_external_semaphore_capabilities    required
+		VK_KHR_get_physical_device_properties2    required
+ INFO [create_device] Created device and COMPUTE queue with QUEUE_GLOBAL_PRIORITY_REALTIME.
+ INFO [vk_print_device_info] Device info:
+	name: NVIDIA A40
+	vendor: 0x10de
+	product: 0x2235
+	deviceType: VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+	apiVersion: 1.4.325
+	driverVersion: 0x938c0040
+ INFO [vk_print_queues_info] Selected Queues/Families:
+	main_queue.queue: 0x5beb74592930
+	main_queue.index: 0
+	main_queue.family_index: 2
+	graphics_queue.queue: 0x5beb745821b0
+	graphics_queue.index: 0
+	graphics_queue.family_index: 0
+ INFO [vk_print_features_info] Features:
+	timestamp_compute_and_graphics: true
+	timestamp_period: 1.000000
+	timestamp_valid_bits: 64
+	timeline_semaphore: true
+ INFO [vk_print_external_handles_info] Supported images:
+	VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT:
+		color import=true export=true
+		depth import=true export=true
+ INFO [vk_print_external_handles_info] Supported fences:
+	VK_EXTERNAL_FENCE_HANDLE_TYPE_SYNC_FD_BIT: true
+	VK_EXTERNAL_FENCE_HANDLE_TYPE_OPAQUE_FD_BIT: true
+ INFO [vk_print_external_handles_info] Supported semaphores:
+	VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT(binary): true
+	VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT(binary): true
+	VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT(timeline): false
+	VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT(timeline): true
+ INFO [initResources] Created CUDA context (0x5beb74c5a950) for device 0.
+ INFO [initResources] Creating empty push target (512x512)
+ INFO [create] Runtime compositor initialization completed with result 0
+ INFO [create] Assembling RuntimeSystem object from initialized components
+ INFO [create] RuntimeSystem object assembled successfully
+ INFO [create] Creating input stream for client-to-server communication
+ INFO [create] Input stream creation completed with result 0
+ INFO [create] Creating video streams for server-to-client frame delivery
+ INFO [create] Video streams created and configured
+ INFO [create] Creating audio stream for spatial audio delivery
+ INFO [create] Creating audio stream: 48000 Hz, 2 channels, 16 bits
+ INFO [create] Audio stream created successfully with ID: 0x5beb75de5890
+ INFO [create] Audio stream creation completed with result 0
+ERROR [create] Audio capture is currently only supported on Windows platforms
+ INFO [create] Creating streaming server with all configured streams
+
+Failed to open [/var/run/utmp]
+ INFO [create] Streaming server creation completed with result 0
+ INFO [create] Starting the streaming server to accept client connections
+ INFO [startServer] Starting server
+ INFO [create] Streaming server start completed with result 0
+ INFO [create] All runtime sub-components initialized, RuntimeSystem::create completed successfully
+ INFO [createRuntimeSystem] RuntimeSystem::create completed with result: Result::SUCCESS
+ INFO [createRuntimeSystem] Runtime system created, finalizing startup and handing off to IPC service
+ INFO [print_end_user_started_information] 
+################################################################################
+#                                                                              #
+#            The NVIDIA(TM) CloudXR(TM) Runtime service has started.           #
+#                                                                              #
+################################################################################
+ INFO [nv_cxr_service_start] Runtime is now running and accepting connections
+Active user not found. Using default user [kiosk]CloudXR service started successfully
+Waiting for CloudXR auto-webrtc client connection...
+CloudXR Runtime initialized successfully
+ INFO [onSignalingHeaders] Client token verification disabled, accepting connection (source: property)
+ INFO [onClientEventRaised] Client connecting to signaling channel (code: 220)
+ INFO [onClientEventRaised] Client connection (code: 207)
+[33mmain: thread_init: already added for thread
+[;m WARN [onClientEventRaised] Client connection event unknown '0x0005' (code: 227)
+ INFO [onClientEventRaised] Client message channel is ready (code: 226)
+ INFO [onClientEventRaised] Client connection (code: 215)
+ INFO [onClientEventRaised] Client connected to signaling channel (code: 200)
+ INFO [start] Starting frame monitor
+ INFO [verifyAndLogPackedFrameStreamSize] Client connected, packed stream size: 4096x4032
+ INFO [onStreamEventRaised] Input stream connected
+ INFO [onStreamEventRaised] Audio stream connected! Connection ID: 0x76e518075800
+ INFO [startStreaming] Starting audio streaming
+CloudXR client is connected
+ INFO [onStreamEventRaised] Video stream connected: packed
+ INFO [processSystemInfo] Got system info from CloudXR client.
+	protocol: 6.1.0
+	client: 6.4.0
+	git-tag: <unknown>
+	body_tracking: false
+	controller_haptics: true
+	form_factor: hmd
+	view_count: 2
+	color_only_video_streams: true
+	color_and_alpha_video_streams: true
+	color_and_depth_video_streams: true
+	client_reconstructed: true
+ERROR [processSystemInfo] Making device configuration
+ INFO [processSystemInfo] Processed SystemInfo successfully.
+ INFO [triggerOnClientConnectActions] Sending ServerInfo and other announce messages
+ INFO [clientConnected] Client 1 connected to pipe
+ INFO [start] Starting clock sync system.
+ INFO [ipc_handle_instance_describe_client] Client info:
+	id: 1
+	application_name: 'LÖVR'
+	pid: 51
+	extensions:
+		ext_hand_tracking_enabled: true
+		ext_hand_tracking_data_source_enabled: false
+		ext_eye_gaze_interaction_enabled: false
+		ext_future_enabled: false
+		ext_hand_interaction_enabled: true
+		htc_facial_tracking_enabled: false
+		fb_body_tracking_enabled: false
+		meta_body_tracking_full_body_enabled: false
+		meta_body_tracking_calibration_enabled: false
+		fb_face_tracking2_enabled: false
+		android_face_tracking_enabled: false
+ INFO [start] Started clock sync system.
+LOG in xrCreateInstance: Instance created
+	createInfo->applicationInfo.applicationName: LÖVR
+	createInfo->applicationInfo.applicationVersion: 0
+	createInfo->applicationInfo.engineName: LÖVR
+	createInfo->applicationInfo.engineVersion: 1179648
+	createInfo->applicationInfo.apiVersion: 1.0.53
+	appinfo.detected.engine.name: (null)
+	appinfo.detected.engine.version: 0.0.0
+	quirks.disable_vulkan_format_depth: false
+	quirks.disable_vulkan_format_depth_stencil: false
+	quirks.disable_quad_views: false
+	quirks.no_validation_error_in_create_ref_space: true
+	quirks.skip_end_session: false
+	quirks.parallel_views: false
+	quirks.no_texture_source_alpha: false
+
+ INFO [FoveationDecider] Environmental variables:
+	NV_CXR_RUNTIME_FOVEATION: false
+	NV_CXR_APP_PQW_SUBMIT_MODE: warped
+	NV_CXR_APP_PQW_WARPED_WIDTH: 0
+	NV_CXR_APP_PQW_INSET: 0
+	NV_CXR_RUNTIME_FOVEATION_UNWARPED_WIDTH: 0
+	NV_CXR_RUNTIME_FOVEATION_WARPED_WIDTH: 0
+	NV_CXR_RUNTIME_FOVEATION_INSET: 0
+ INFO [updateFoveationParams] Updated parameters:
+	View 0 warped:2048x1792 unwarped:4096x3584 radius:819,716 center:2544,1445
+	View 1 warped:2048x1792 unwarped:4096x3584 radius:819,716 center:1551,1445
+ INFO [updateQuadViewParameters] QuadView[0]: Context dims=1024x896, Inset dims=1638x1433
+ INFO [updateQuadViewParameters] QuadView[1]: Context dims=1024x896, Inset dims=1638x1433
+ INFO [updateQuadViewParameters] Pixel totals - Context: 1835008 pixels, Inset: 4694508 pixels, Combined: 6529516 pixels, Unwarped: 29360128 pixels (Combined is 22.24% of Unwarped)
+ INFO [updateQuadViewParameters] QuadView[0]: Context dims=1024x896, Inset dims=1638x1433
+ INFO [updateQuadViewParameters] QuadView[1]: Context dims=1024x896, Inset dims=1638x1433
+ INFO [updateQuadViewParameters] Pixel totals - Context: 1835008 pixels, Inset: 4694508 pixels, Combined: 6529516 pixels, Unwarped: 29360128 pixels (Combined is 22.24% of Unwarped)
+ INFO [processViewConfiguration] Processed ViewConfiguration successfully.
+ INFO [create] Creating compositor
+ WARN [log_unsupported_gpu_warning] 
+###
+#
+# Unsupported GPU detected!
+# GPU: NVIDIA A40 (Vendor: 0x10de, Device: 0x2235)
+#
+# This runtime only supports specific GPU models.
+# Supported GPUs:
+#   - NVIDIA GeForce RTX 4090 (Vendor: 0x10de, Device: 0x2684)
+#   - NVIDIA GeForce RTX 5080 (Vendor: 0x10de, Device: 0x2c02)
+#   - NVIDIA GeForce RTX 5090 (Vendor: 0x10de, Device: 0x2b85)
+#   - NVIDIA RTX 6000 Ada Generation (Vendor: 0x10de, Device: 0x26b1)
+#   - NVIDIA RTX PRO 6000 Blackwell Server Edition (Vendor: 0x10de, Device: 0x2bb5)
+#   - NVIDIA L40 (Vendor: 0x10de, Device: 0x26b5)
+#   - NVIDIA L40S (Vendor: 0x10de, Device: 0x26b9)
+#
+###
+ INFO [comp_vulkan_formats_log] Supported formats:
+	VK_FORMAT_R16G16B16A16_UNORM: true
+	VK_FORMAT_R16G16B16A16_SFLOAT: true
+	VK_FORMAT_R16G16B16_UNORM: false
+	VK_FORMAT_R16G16B16_SFLOAT: false
+	VK_FORMAT_R8G8B8A8_SRGB: true
+	VK_FORMAT_B8G8R8A8_SRGB: true
+	VK_FORMAT_R8G8B8_SRGB: false
+	VK_FORMAT_R8G8B8A8_UNORM: true
+	VK_FORMAT_B8G8R8A8_UNORM: true
+	VK_FORMAT_R8G8B8_UNORM: false
+	VK_FORMAT_B8G8R8_UNORM: false
+	VK_FORMAT_R5G6B5_UNORM_PACK16: true
+	VK_FORMAT_R32_SFLOAT: true
+	VK_FORMAT_D32_SFLOAT: true
+	VK_FORMAT_D16_UNORM: true
+	VK_FORMAT_X8_D24_UNORM_PACK32: true
+	VK_FORMAT_D24_UNORM_S8_UINT: true
+	VK_FORMAT_D32_SFLOAT_S8_UINT: true
+	VK_FORMAT_S8_UINT: true
+ INFO [initResources] Creating:
+	streaming_dimensions: 4096 x 4032
+	render_dimensions: 2048 x 1792
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [markEnd] [PoseInterarrivalTime] Didn't find start time for 0
+ WARN [markEnd] [DevicePoseInterval] Didn't find start time for 0
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ INFO [createSystem] No push device interface!
+ INFO [createSystem] No tensor interface
+LOG in xrGetSystem: Selected devices
+	Head: 'Head Device'
+	Eyes: '<none>'
+	Left: '<none>'
+	Right: '<none>'
+	Gamepad: '<none>'
+	Hand-Tracking Left (unobstructed): 'Head Device'
+	Hand-Tracking Right (unobstructed): 'Head Device'
+	Hand-Tracking Left (conforming): '<none>'
+	Hand-Tracking Right (conforming): '<none>'
+LOG in xrCreateVulkanInstanceKHR: Creation of VkInstance:
+	result: VK_SUCCESS
+	vulkanInstance: 0x5beb7679b7a0
+	extensions:
+		VK_KHR_external_fence_capabilities
+		VK_KHR_external_memory_capabilities
+		VK_KHR_external_semaphore_capabilities
+		VK_KHR_get_physical_device_properties2
+		VK_EXT_debug_utils
+		VK_KHR_portability_enumeration
+		VK_EXT_swapchain_colorspace
+		VK_KHR_surface
+		VK_KHR_xcb_surface
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+LOG in xrGetVulkanGraphicsDeviceKHR: Creation of VkDevice:
+	result: VK_SUCCESS
+	vulkanDevice: 0x5beb76a6e820
+	vulkanInstance: 0x5beb7679b7a0
+	external_fence_fd: true
+	external_semaphore_fd: true
+	timelineSemaphore: true
+	extensions:
+		VK_KHR_dedicated_allocation
+		VK_KHR_external_fence
+		VK_KHR_external_memory
+		VK_KHR_external_semaphore
+		VK_KHR_get_memory_requirements2
+		VK_KHR_external_memory_fd
+		VK_KHR_acceleration_structure
+		VK_KHR_buffer_device_address
+		VK_KHR_create_renderpass2
+		VK_KHR_deferred_host_operations
+		VK_KHR_swapchain
+		VK_KHR_depth_stencil_resolve
+		VK_KHR_ray_query
+		VK_KHR_shader_float_controls
+		VK_KHR_spirv_1_4
+		VK_KHR_image_format_list
+		VK_KHR_synchronization2
+		VK_KHR_dynamic_rendering
+		VK_KHR_timeline_semaphore
+		VK_EXT_descriptor_indexing
+		VK_EXT_scalar_block_layout
+		VK_EXT_pipeline_creation_cache_control
+		VK_EXT_memory_budget
+		VK_KHR_external_semaphore_fd
+		VK_KHR_external_fence_fd
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+OpenXR extension procedures loaded successfully
+Opaque data channel created: 0x5beb7aaad5e0
+Opaque data channel created successfully
+Initializing Audio Manager...
+Error: lovr.audio module not available
+Failed to initialize Audio Manager
+Application initialized successfully
+ INFO [report] 
+                            name         average             min             max
+                 PredictDuration         0.000ms 9223372'036'854.775ms 9223372'036'854.775ms
+             WaitWakeToSubmitEnd         0.000ms 9223372'036'854.775ms 9223372'036'854.775ms
+             LayerCommitToGpuEnd         0.000ms 9223372'036'854.775ms 9223372'036'854.775ms
+           WaitWakeToNextPredict         0.000ms 9223372'036'854.775ms 9223372'036'854.775ms
+              DevicePoseInterval        30.360ms         3.399ms        77.000ms
+            PredictEndToWaitWake         0.000ms 9223372'036'854.775ms 9223372'036'854.775ms
+         PredictEndToNextPredict         0.000ms 9223372'036'854.775ms 9223372'036'854.775ms
+              PredictEndToGpuEnd         0.000ms 9223372'036'854.775ms 9223372'036'854.775ms
+            PoseInterarrivalTime        30.270ms         2.443ms        76.921ms
+               GpuEndToEncodeEnd         0.000ms 9223372'036'854.775ms 9223372'036'854.775ms
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ INFO [init] Created hand tracker:
+	mode: callback
+	hand: left
+	locked xdev: <none>
+	input count: 2
+	output count: 0
+	input[0]: XRT_INPUT_HT_UNOBSTRUCTED_LEFT xdev='Head Device'
+	input[1]: XRT_INPUT_HT_UNOBSTRUCTED_LEFT xdev='Left Head Device Hand'
+ INFO [init] Created hand tracker:
+	mode: callback
+	hand: right
+	locked xdev: <none>
+	input count: 2
+	output count: 0
+	input[0]: XRT_INPUT_HT_UNOBSTRUCTED_RIGHT xdev='Head Device'
+	input[1]: XRT_INPUT_HT_UNOBSTRUCTED_RIGHT xdev='Right Head Device Hand'
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ INFO [report] 
+                            name         average             min             max
+                 PredictDuration        23.033ms         0.534ms        42.418ms
+             WaitWakeToSubmitEnd         6.601ms         2.298ms        10.623ms
+             LayerCommitToGpuEnd         1.098ms         0.966ms         1.746ms
+           WaitWakeToNextPredict         7.088ms         2.496ms        11.258ms
+              DevicePoseInterval        26.926ms         0.899ms        81.800ms
+            PredictEndToWaitWake         0.700ms         0.163ms         1.402ms
+         PredictEndToNextPredict         7.803ms         2.771ms        11.883ms
+              PredictEndToGpuEnd         7.685ms         2.931ms        11.506ms
+            PoseInterarrivalTime        26.933ms         0.755ms        81.843ms
+               GpuEndToEncodeEnd        14.465ms        13.325ms        18.721ms
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ INFO [processControllerRegistration] Received controller registration: profile=meta/touch_plus, version=1, chirality=Left, id=0 inputs=22 outputs=1
+ INFO [registerController] Mapping 22 client input to 22 server inputs.
+ INFO [registerController] Mapping 1 client outputs to 1 server outputs.
+ INFO [registerController] Controller 'Quest Touch Plus Left' was successfully registered!
+ INFO [processControllerRegistration] Received controller registration: profile=meta/touch_plus, version=1, chirality=Right, id=1 inputs=22 outputs=1
+ INFO [registerController] Mapping 22 client input to 22 server inputs.
+ INFO [registerController] Mapping 1 client outputs to 1 server outputs.
+ INFO [registerController] Controller 'Quest Touch Plus Right' was successfully registered!
+ INFO [processControllerEquip] Equipping controller: 'Quest Touch Plus Left' (0) in slot: 'hand/left'
+ INFO [processControllerEquip] Equipping controller: 'Quest Touch Plus Right' (1) in slot: 'hand/right'
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+Haptics event #1: action=left-manual-buzz hand=left amp=1.00 dur=0.15 freq=0.00 success=true
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+ WARN [handleMessageViewUpdate] Clock sync is not yet initialized, using client sample time as pose arrival time.
+Haptics event #2: action=right-manual-buzz hand=right amp=1.00 dur=0.15 freq=0.00 success=true
+Haptics event #3: action=left-manual-stop hand=left amp=0.00 dur=0.00 freq=0.00 success=true
+ INFO [report] 
+                            name         average             min             max
+                 PredictDuration        27.653ms         0.771ms        53.966ms
+             WaitWakeToSubmitEnd         6.848ms         4.190ms         8.840ms
+             LayerCommitToGpuEnd         1.065ms         0.905ms         1.863ms
+           WaitWakeToNextPredict         7.394ms         4.464ms         9.551ms
+              DevicePoseInterval        54.111ms        19.000ms       177.200ms
+            PredictEndToWaitWake         0.741ms         0.126ms         1.415ms
+         PredictEndToNextPredict         8.128ms         5.103ms        10.816ms
+              PredictEndToGpuEnd         7.940ms         5.217ms        10.659ms
+            PoseInterarrivalTime        54.102ms        19.027ms       177.722ms
+               GpuEndToEncodeEnd        14.173ms        12.951ms        17.636ms
+Haptics event #4: action=right-manual-stop hand=right amp=0.00 dur=0.00 freq=0.00 success=true
+ INFO [report] 
+                            name         average             min             max
+                 PredictDuration        44.636ms        22.208ms        63.360ms
+             WaitWakeToSubmitEnd         6.347ms         2.848ms        18.655ms
+             LayerCommitToGpuEnd         1.030ms         0.887ms         1.203ms
+           WaitWakeToNextPredict         6.811ms         3.058ms        19.331ms
+              DevicePoseInterval        52.205ms        31.100ms        75.300ms
+            PredictEndToWaitWake         0.763ms         0.074ms         1.411ms
+         PredictEndToNextPredict         7.573ms         3.780ms        20.329ms
+              PredictEndToGpuEnd         7.447ms         3.851ms        19.968ms
+            PoseInterarrivalTime        52.211ms        30.826ms        75.344ms
+               GpuEndToEncodeEnd        13.532ms        12.962ms        14.056ms
+ INFO [report] 
+                            name         average             min             max
+                 PredictDuration        49.558ms        34.832ms        68.522ms
+             WaitWakeToSubmitEnd         6.924ms         3.862ms         9.114ms
+             LayerCommitToGpuEnd         1.058ms         0.881ms         1.200ms
+           WaitWakeToNextPredict         7.438ms         4.246ms         9.794ms
+              DevicePoseInterval        56.771ms        27.600ms        75.200ms
+            PredictEndToWaitWake         0.727ms         0.088ms         1.406ms
+         PredictEndToNextPredict         8.154ms         4.615ms        11.159ms
+              PredictEndToGpuEnd         7.966ms         4.564ms        10.814ms
+            PoseInterarrivalTime        56.782ms        27.375ms        75.206ms
+               GpuEndToEncodeEnd        13.728ms        13.200ms        14.650ms
+ INFO [report] 
+                            name         average             min             max
+                 PredictDuration        47.288ms         0.810ms        67.799ms
+             WaitWakeToSubmitEnd         6.738ms         2.444ms         9.356ms
+             LayerCommitToGpuEnd         1.057ms         0.918ms         1.404ms
+           WaitWakeToNextPredict         7.294ms         2.637ms         9.974ms
+              DevicePoseInterval        56.139ms        24.100ms        69.699ms
+            PredictEndToWaitWake         0.740ms         0.089ms         1.491ms
+         PredictEndToNextPredict         8.024ms         3.493ms        11.341ms
+              PredictEndToGpuEnd         7.728ms         3.635ms        11.186ms
+            PoseInterarrivalTime        56.146ms        24.169ms        70.307ms
+               GpuEndToEncodeEnd        13.867ms        13.061ms        19.084ms
+ INFO [onClientEventRaised] Client connection RTSP teardown success (code: 217)
+ERROR [pushStreamDataHapticInput] InputStream: nvstPushStreamData() failed: NVST_R_INVALID_OPERATION
+ERROR [announceLocked] Failed to send announce message
+ WARN [disconnectLocked] Disconnecting pending opaque data channel with allocated channel ID 2; announce may have failed
+Opaque data channel created: 0x5beb7aaad5e0
+ERROR [pushStreamDataHapticInput] InputStream: nvstPushStreamData() failed: NVST_R_INVALID_OPERATION
+ERROR [pushStreamDataHapticInput] InputStream: nvstPushStreamData() failed: NVST_R_INVALID_OPERATION
+ERROR [announceLocked] Failed to send announce message
+ WARN [disconnectLocked] Disconnecting pending opaque data channel with allocated channel ID 3; announce may have failed
+Opaque data channel created: 0x5beb7aaad5e0
+ INFO [onStreamEventRaised] Input stream disconnected
+ INFO [unregisterController] Removing map and resetting state.
+ INFO [unregisterController] Removing map and resetting state.
+ INFO [stop] Stopping clock sync system.
+ INFO [stop] Stopped clock sync system.
+ INFO [onStreamEventRaised] Video stream disconnected: packed
+ INFO [onStreamEventRaised] Audio stream disconnected from connection ID: 0x76e518075800
+ INFO [stopStreaming] Audio streaming stopped
+ INFO [onClientEventRaised] Client diconnected from signaling channel (code: 205)
+ INFO [stop] Stopping frame monitor
+ERROR [fillInMetadata] Did not find pose for frame.
+ INFO [onClientEventRaised] Client connection (code: 216)
+Opaque data channel created: 0x5beb7aaad5e0
+ WARN [wait] Waited 1s second for the encoding.
+	FrameID: 653
+	StartingStreams: 1
+	CurrentStreams: 1
+	Discarded: 0
+	Enqueued: 1
+	Dropped: 0
+	Encoded: 0
+	Notified: 0
+ INFO [report] 
+                            name         average             min             max
+                 PredictDuration        42.722ms         4.850ms        68.899ms
+             WaitWakeToSubmitEnd         6.438ms         3.115ms         9.262ms
+             LayerCommitToGpuEnd         1.047ms         0.885ms         1.207ms
+           WaitWakeToNextPredict         6.932ms         3.588ms         9.916ms
+              DevicePoseInterval        48.513ms         5.800ms        65.800ms
+            PredictEndToWaitWake         0.821ms         0.169ms         2.973ms
+         PredictEndToNextPredict         7.748ms         4.186ms        10.783ms
+              PredictEndToGpuEnd         7.616ms         4.106ms        10.786ms
+            PoseInterarrivalTime        48.511ms         5.773ms        65.833ms
+               GpuEndToEncodeEnd        13.744ms        13.056ms        17.112ms
+ INFO [clientDisconnected] Client 1 disconnected from pipe
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ipc_compositor_wait_frame] ipc_call_compositor_predict_frame failed: XRT_ERROR_IPC_FAILURE [/builds/cloudxr/cloudxr-openxr-runtime/deps/monado/src/xrt/ipc/client/ipc_client_compositor.c:566]
+XR_ERROR_INSTANCE_LOST in xrWaitFrame: Call to xrt_comp_wait_frame failed
+Error:
+
+OpenXR Error: xrWaitFrame returned XR_ERROR_INSTANCE_LOST
+
+Stack:
+
+[C]: in function 'update'
+main.lua:46: in function <main.lua:30>
+[C]: in function 'xpcall'
+XR_ERROR_SESSION_LOST in xrWaitFrame: Session is lost
+Error:
+
+OpenXR Error: xrWaitFrame returned XR_ERROR_SESSION_LOST
+
+Stack:
+
+boot.lua:414: in function <boot.lua:413>
+[C]: in function 'update'
+boot.lua:344: in function <boot.lua:332>
+[C]: in function 'xpcall'
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ipc_compositor_swapchain_destroy] ipc_call_swapchain_destroy failed: XRT_ERROR_IPC_FAILURE [/builds/cloudxr/cloudxr-openxr-runtime/deps/monado/src/xrt/ipc/client/ipc_client_compositor.c:176]
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ipc_client_allocation_collection_destroy] ipc_call_allocation_collection_destroy failed: XRT_ERROR_IPC_FAILURE [/builds/cloudxr/cloudxr-openxr-runtime/deps/monado/src/xrt/ipc/client/ipc_client_allocation_collection.c:60]
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ipc_compositor_swapchain_destroy] ipc_call_swapchain_destroy failed: XRT_ERROR_IPC_FAILURE [/builds/cloudxr/cloudxr-openxr-runtime/deps/monado/src/xrt/ipc/client/ipc_client_compositor.c:176]
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ipc_client_allocation_collection_destroy] ipc_call_allocation_collection_destroy failed: XRT_ERROR_IPC_FAILURE [/builds/cloudxr/cloudxr-openxr-runtime/deps/monado/src/xrt/ipc/client/ipc_client_allocation_collection.c:60]
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ref_space_dec] ipc_call_space_unmark_ref_space_in_use failed: XRT_ERROR_IPC_FAILURE [/builds/cloudxr/cloudxr-openxr-runtime/deps/monado/src/xrt/ipc/client/ipc_client_space_overseer.c:278]
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ref_space_dec] ipc_call_space_unmark_ref_space_in_use failed: XRT_ERROR_IPC_FAILURE [/builds/cloudxr/cloudxr-openxr-runtime/deps/monado/src/xrt/ipc/client/ipc_client_space_overseer.c:278]
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ref_space_dec] ipc_call_space_unmark_ref_space_in_use failed: XRT_ERROR_IPC_FAILURE [/builds/cloudxr/cloudxr-openxr-runtime/deps/monado/src/xrt/ipc/client/ipc_client_space_overseer.c:278]
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ipc_client_compositor_semaphore_destroy] ipc_call_compositor_semaphore_destroy failed: XRT_ERROR_IPC_FAILURE [/builds/cloudxr/cloudxr-openxr-runtime/deps/monado/src/xrt/ipc/client/ipc_client_compositor.c:244]
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ipc_client_session_destroy] ipc_call_session_destroy failed: XRT_ERROR_IPC_FAILURE [/builds/cloudxr/cloudxr-openxr-runtime/deps/monado/src/xrt/ipc/client/ipc_client_session.c:75]
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ERROR [ipc_send] sendmsg(90) failed: '32' 'Broken pipe'!
+ INFO [destroy] Instance - deleting
+ INFO [~RuntimeSystem] Entering
+ INFO [~RuntimeSystem] Stopping server
+ERROR [stopStreamingServer] nvstStopServer() failed: NVST_R_INVALID_STATE
+ERROR [~RuntimeSystem] Server::stopStreamingServer failed: Result::ERROR_STREAMSDK_SERVER_STOP [/builds/cloudxr/cloudxr-openxr-runtime/src/nvidia/cxr/server/engine/nv_runtime_system.cpp:645]
+ INFO [~RuntimeSystem] Stopped server
+ INFO [~RuntimeSystem] Exiting
+ INFO [~Server] Entering
+ INFO [~Server] Stopping server
+ERROR [stopStreamingServer] nvstStopServer() failed: NVST_R_INVALID_STATE
+ERROR [~Server] Server::stopStreamingServer failed: Result::ERROR_STREAMSDK_SERVER_STOP [/builds/cloudxr/cloudxr-openxr-runtime/src/nvidia/cxr/server/engine/nv_server.cpp:572]
+ INFO [~Server] Stopped server
+ INFO [~Server] Destroying handle
+double free or corruption (fasttop)
