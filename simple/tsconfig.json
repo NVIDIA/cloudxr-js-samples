@@ -5,11 +5,7 @@
     "strict": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext", "WebWorker"],
     "skipLibCheck": true,
-    "types": ["webxr"],
-    "baseUrl": ".",
-    "paths": {
-      "@helpers/*": ["./helpers/*"]
-    }
+    "types": ["webxr"]
   },
   "include": ["**/*.ts", "types/**/*.d.ts"]
 }

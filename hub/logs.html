@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!--
+SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="CloudXR.js hub — headset SDK log viewer" />
+    <title>CloudXR.js Hub — Headset Logs</title>
+    <link rel="stylesheet" href="logs.bundle.css" />
+  </head>
+  <body>
+    <div class="top-banner" aria-hidden="true"></div>
+    <header>
+      <h1>CloudXR.js Hub — Headset Logs</h1>
+      <p class="header-subtitle">
+        SDK log entries forwarded from headsets via <code>clientLogs</code> on
+        <code>/oob/v1/ws</code>. <a href="index.html" class="section-link">← Back to metrics hub</a>
+      </p>
+    </header>
+
+    <main>
+      <aside>
+        <div id="statusMessageBox" class="status-message-box status-off" role="status" aria-live="polite">
+          <span id="wsStatus">Disconnected</span>
+        </div>
+
+        <button id="connectBtn" class="connect-button" type="button">CONNECT</button>
+
+        <h2 class="settings-title">Hub connection</h2>
+        <label for="host" class="input-label">Hub host</label>
+        <input id="host" class="ui-input" type="text" autocomplete="off" spellcheck="false" />
+
+        <label for="port" class="input-label">Hub port</label>
+        <input id="port" class="ui-input" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" />
+
+        <label for="token" class="input-label">controlToken (optional)</label>
+        <input id="token" class="ui-input" type="text" autocomplete="off" spellcheck="false" />
+
+        <h2 class="settings-title">Headsets</h2>
+        <div id="headsets" class="headset-list">
+          <p class="muted">No headsets connected.</p>
+        </div>
+
+        <div class="help">
+          <p>
+            <strong>Sample URL:</strong>
+            <code>?oobEnable=1&amp;hubPort=8787</code>
+          </p>
+          <p class="muted">Set CloudXR Server IP to match Hub host. Verbose: <code>?debug=1</code></p>
+        </div>
+      </aside>
+
+      <section>
+        <h2 class="section-title">Headset logs</h2>
+        <p class="section-hint">SDK log entries forwarded from headsets. Use the toolbar to filter, search, and download.</p>
+        <div id="headsetLogPanel"></div>
+
+        <h2 class="section-title">Event log</h2>
+        <div id="log" class="log" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <script type="module" src="logs.bundle.js"></script>
+  </body>
+</html>

@@ -33,6 +33,7 @@ module.exports = merge(common, {
   },
   devServer: {
     allowedHosts: 'all',
+    host: '0.0.0.0',
     hot: true,
     open: false,
     port: 8080,

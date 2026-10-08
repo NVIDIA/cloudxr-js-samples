@@ -32,21 +32,6 @@
  */
 
 import {
-  getDeviceProfile,
-  resolveDeviceProfileId,
-  type DeviceProfileId,
-} from '@helpers/DeviceProfiles';
-import {
-  CloudXRConfig,
-  enableLocalStorage,
-  getGridFromInputs,
-  getResolutionFromInputs,
-  setSelectValueIfAvailable,
-  setupCertificateAcceptanceLink,
-  type CertLinkController,
-  type CertStatusInfo,
-} from '@helpers/utils';
-import {
   getGridValidationError,
   getGridValidationMessageForConnect,
   getResolutionValidationError,
@@ -54,6 +39,24 @@ import {
   validateDepthReprojectionGrid,
   validatePerEyeResolution,
 } from '@nvidia/cloudxr';
+
+import type { CloudXRConfig } from './config/CloudXRConfig';
+import { URL_PARAMS } from './config/params';
+import { seedsFromParams } from './config/resolve';
+import {
+  enableLocalStorage,
+  getGridFromInputs,
+  getResolutionFromInputs,
+  setSelectValueIfAvailable,
+  setupCertificateAcceptanceLink,
+  type CertLinkController,
+  type CertStatusInfo,
+} from './utils/configuration';
+import {
+  getDeviceProfile,
+  resolveDeviceProfileId,
+  type DeviceProfileId,
+} from './utils/DeviceProfiles';
 
 /**
  * 2D UI Management for CloudXR React Example
@@ -69,6 +72,8 @@ export class CloudXR2DUI {
   private portInput!: HTMLInputElement;
   /** Input field for proxy URL configuration */
   private proxyUrlInput!: HTMLInputElement;
+  /** Input field for the per-session client token (kept ephemeral; never persisted) */
+  private clientTokenInput!: HTMLInputElement;
   /** Dropdown to select between AR and VR immersive modes */
   private immersiveSelect!: HTMLSelectElement;
   /** Dropdown to select device frame rate (FPS) */
@@ -135,6 +140,12 @@ export class CloudXR2DUI {
   private mediaAddressInput!: HTMLInputElement;
   /** Input field for media server port */
   private mediaPortInput!: HTMLInputElement;
+  /** Dropdown to select network test mode */
+  private streamTestModeSelect!: HTMLSelectElement;
+  /** Input field for network test duration (seconds) */
+  private streamTestDurationSecondsInput!: HTMLInputElement;
+  /** Select for microphone upstream enable/disable */
+  private micEnabledSelect!: HTMLSelectElement;
   /** Flag to track if the 2D UI has been initialized */
   private initialized: boolean = false;
 
@@ -174,6 +185,7 @@ export class CloudXR2DUI {
     try {
       this.initializeElements();
       this.setupLocalStorage();
+      this.applyUrlSeeds();
       this.setupProxyConfiguration();
       this.setupEventListeners();
       // Set initial display value
@@ -189,6 +201,24 @@ export class CloudXR2DUI {
   }
 
   /**
+   * Seeds form controls from URL query params (see URL_PARAMS). Values are applied
+   * but not persisted; called after setupLocalStorage() so URL params win over
+   * stored values for this load.
+   */
+  private applyUrlSeeds(): void {
+    const seeds = seedsFromParams(new URLSearchParams(window.location.search));
+    for (const param of URL_PARAMS) {
+      const raw = seeds.get(param.key);
+      if (raw === undefined) continue;
+      const el = document.getElementById(param.elementId) as
+        | HTMLInputElement
+        | HTMLSelectElement
+        | null;
+      if (el) el.value = raw;
+    }
+  }
+
+  /**
    * Initializes all DOM element references by their IDs
    * Throws an error if any required element is not found
    */
@@ -197,6 +227,7 @@ export class CloudXR2DUI {
     this.serverIpInput = this.getElement<HTMLInputElement>('serverIpInput');
     this.portInput = this.getElement<HTMLInputElement>('portInput');
     this.proxyUrlInput = this.getElement<HTMLInputElement>('proxyUrl');
+    this.clientTokenInput = this.getElement<HTMLInputElement>('clientToken');
     this.immersiveSelect = this.getElement<HTMLSelectElement>('immersive');
     this.deviceFrameRateSelect = this.getElement<HTMLSelectElement>('deviceFrameRate');
     this.maxStreamingBitrateMbpsSelect =
@@ -241,6 +272,12 @@ export class CloudXR2DUI {
     this.certLink = this.getElement<HTMLAnchorElement>('certLink');
     this.mediaAddressInput = this.getElement<HTMLInputElement>('mediaAddress');
     this.mediaPortInput = this.getElement<HTMLInputElement>('mediaPort');
+    this.streamTestModeSelect = this.getElement<HTMLSelectElement>('streamTestMode');
+    this.streamTestDurationSecondsInput = this.getElement<HTMLInputElement>(
+      'streamTestDurationSeconds'
+    );
+    // Bind mic control so it follows the same init/teardown lifecycle as other form selects.
+    this.micEnabledSelect = this.getElement<HTMLSelectElement>('micEnabled');
   }
 
   /**
@@ -274,8 +311,8 @@ export class CloudXR2DUI {
       reprojectionGridCols: 0,
       reprojectionGridRows: 0,
       deviceFrameRate: 90,
-      maxStreamingBitrateMbps: 150,
-      codec: 'av1',
+      maxStreamingBitrateMbps: 100,
+      codec: 'auto',
       immersiveMode: 'ar',
       deviceProfileId: 'custom',
       app: 'generic',
@@ -286,6 +323,9 @@ export class CloudXR2DUI {
       posePredictionFactor: 1.0,
       enableTexSubImage2D: false,
       useQuestColorWorkaround: false,
+      streamTestMode: 'warn',
+      streamTestDurationSeconds: 5,
+      micEnabled: true,
     };
   }
 
@@ -318,6 +358,10 @@ export class CloudXR2DUI {
     enableLocalStorage(this.xrOffsetZInput, 'xrOffsetZ');
     enableLocalStorage(this.mediaAddressInput, 'mediaAddress');
     enableLocalStorage(this.mediaPortInput, 'mediaPort');
+    enableLocalStorage(this.streamTestModeSelect, 'streamTestMode');
+    enableLocalStorage(this.streamTestDurationSecondsInput, 'streamTestDurationSeconds');
+    // Persist mic preference across page loads alongside other stream settings.
+    enableLocalStorage(this.micEnabledSelect, 'micEnabled');
   }
 
   /**
@@ -410,10 +454,17 @@ export class CloudXR2DUI {
     addListener(this.xrOffsetZInput, 'change', updateConfig);
     addListener(this.proxyUrlInput, 'input', updateConfig);
     addListener(this.proxyUrlInput, 'change', updateConfig);
+    addListener(this.clientTokenInput, 'input', updateConfig);
+    addListener(this.clientTokenInput, 'change', updateConfig);
     addListener(this.mediaAddressInput, 'input', updateConfig);
     addListener(this.mediaAddressInput, 'change', updateConfig);
     addListener(this.mediaPortInput, 'input', updateConfig);
     addListener(this.mediaPortInput, 'change', updateConfig);
+    addListener(this.streamTestModeSelect, 'change', updateConfig);
+    addListener(this.streamTestDurationSecondsInput, 'input', updateConfig);
+    addListener(this.streamTestDurationSecondsInput, 'change', updateConfig);
+    // Trigger config rebuild when the user toggles mic on/off.
+    addListener(this.micEnabledSelect, 'change', updateConfig);
 
     addListener(this.deviceProfileSelect, 'change', () => {
       this.applyDeviceProfileToForm(resolveDeviceProfileId(this.deviceProfileSelect.value));
@@ -559,13 +610,14 @@ export class CloudXR2DUI {
       maxStreamingBitrateMbps:
         parseInt(this.maxStreamingBitrateMbpsSelect.value) ||
         this.getDefaultConfiguration().maxStreamingBitrateMbps,
-      codec: this.codecSelect.value as 'h264' | 'h265' | 'av1',
+      codec: this.codecSelect.value as 'auto' | 'h264' | 'h265' | 'av1',
       immersiveMode:
         (this.immersiveSelect.value as 'ar' | 'vr') || this.getDefaultConfiguration().immersiveMode,
       deviceProfileId: resolveDeviceProfileId(this.deviceProfileSelect.value),
       app: this.appSelect.value || this.getDefaultConfiguration().app,
       serverType: this.serverTypeSelect.value || this.getDefaultConfiguration().serverType,
       proxyUrl: this.proxyUrlInput.value || this.getDefaultConfiguration().proxyUrl,
+      clientToken: this.clientTokenInput.value.trim() || undefined,
       referenceSpaceType:
         (this.referenceSpaceSelect.value as 'auto' | 'local-floor' | 'local' | 'viewer') ||
         this.getDefaultConfiguration().referenceSpaceType,
@@ -592,6 +644,13 @@ export class CloudXR2DUI {
         const v = parseInt(this.mediaPortInput.value, 10);
         return !isNaN(v) ? v : undefined;
       })(),
+      streamTestMode: this.streamTestModeSelect.value as 'off' | 'warn' | 'block',
+      streamTestDurationSeconds: (() => {
+        const v = parseInt(this.streamTestDurationSecondsInput.value, 10);
+        return !isNaN(v) ? v : this.getDefaultConfiguration().streamTestDurationSeconds;
+      })(),
+      // 'false' string means disabled; anything else (including 'true') means enabled.
+      micEnabled: this.micEnabledSelect.value !== 'false',
     };
 
     this.currentConfiguration = newConfiguration;
@@ -604,7 +663,7 @@ export class CloudXR2DUI {
 
   /**
    * Applies a device profile to the form: sets the CloudXR-related fields that the profile defines.
-   * Profile values are in @helpers/DeviceProfiles. The fields set here are profile-linked;
+   * Profile values are in utils/DeviceProfiles. The fields set here are profile-linked;
    * editing any of them switches the device profile to Custom (setProfileToCustomIfNeeded).
    */
   private applyDeviceProfileToForm(profileId: DeviceProfileId): void {
@@ -765,6 +824,10 @@ export class CloudXR2DUI {
           this.updateConnectButtonState();
           return;
         }
+
+        // Retire any result from the previous session once a valid retry begins.
+        this.hideError();
+
         this.setStartButtonState(true, 'CONNECT (starting XR session...)');
 
         try {

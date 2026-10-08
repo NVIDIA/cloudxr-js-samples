@@ -1,0 +1,32 @@
+{
+  "name": "cloudxr-metrics-hub",
+  "version": "6.4.0",
+  "private": true,
+  "description": "Local WebSocket hub and viewer page for CloudXR client metrics",
+  "author": "NVIDIA Corporation",
+  "license": "Apache-2.0",
+  "keywords": [],
+  "type": "module",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "build": "esbuild src/main.ts --bundle --outfile=build/bundle.js --format=esm --platform=browser && esbuild src/logs.ts --bundle --outfile=build/logs.bundle.js --format=esm --platform=browser && cp index.html build/index.html && cp logs.html build/logs.html",
+    "dev": "npm run build && tsx watch server.ts",
+    "start": "npm run build && tsx server.ts",
+    "start:http": "npm run build && tsx server.ts --http",
+    "dev:http": "npm run build && tsx watch server.ts --http"
+  },
+  "dependencies": {
+    "selfsigned": "^5.5.0",
+    "uplot": "^1.6.31",
+    "ws": "^8.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "@types/ws": "^8.18.1",
+    "esbuild": "^0.25.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.2"
+  }
+}

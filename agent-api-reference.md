@@ -1,5 +1,8 @@
 # CloudXR.js API Reference (for Agents)
 
+> **Applies to:** AI agents needing detailed parameter/type definitions for the `@nvidia/cloudxr` public API.
+> **Read this when:** Looking up exact types for `createSession`, `Session`, `SessionOptions`, `MessageChannel`, etc., or verifying a code suggestion against the contract.
+
 Detailed type definitions and parameter descriptions for AI agents and coding assistants. Companion to [SKILL.md](SKILL.md) and [AGENTS.md](AGENTS.md).
 
 For the full generated API docs, see: [docs.nvidia.com/cloudxr-sdk/apis/cloudxr-js/](https://docs.nvidia.com/cloudxr-sdk/apis/cloudxr-js/)
@@ -52,22 +55,23 @@ Use these before `createSession` to show user-friendly validation messages in UI
 
 ### Optional: Networking
 
-| Field                      | Type               | Description                                                                                                  |
-| -------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------ |
-| `mediaAddress`             | `string`           | IP for WebRTC media (NAT traversal). IPv4 only.                                                              |
-| `mediaPort`                | `number`           | Port for WebRTC media. `0` = server-chosen. Only works when `mediaAddress` is set.                           |
-| `sessionId`                | `string`           | NVCF session ID for cloud function routing                                                                   |
-| `signalingQueryParameters` | `string`           | Query params appended to signaling URL (format: `key=val&key2=val2`)                                         |
-| `signalingResourcePath`    | `string`           | Path inserted in signaling URL for proxy routing (e.g. target server IP)                                     |
-| `iceServers`               | `RTCConfiguration` | STUN/TURN servers: `{ iceServers: [{urls, username?, credential?}], iceTransportPolicy?: 'all' \| 'relay' }` |
+| Field                      | Type                     | Description                                                                                                  |
+| -------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `mediaAddress`             | `string`                 | IP for WebRTC media (NAT traversal). IPv4 only.                                                              |
+| `mediaPort`                | `number`                 | Port for WebRTC media. `0` = server-chosen. Only works when `mediaAddress` is set.                           |
+| `sessionId`                | `string`                 | NVCF session ID for cloud function routing                                                                   |
+| `signalingQueryParameters` | `string`                 | Query params appended to signaling URL (format: `key=val&key2=val2`)                                         |
+| `signalingHeaders`         | `Record<string, string>` | Additional signaling handshake headers carried through `Sec-WebSocket-Protocol` by browser clients           |
+| `signalingResourcePath`    | `string`                 | Path inserted in signaling URL for proxy routing (e.g. target server IP)                                     |
+| `iceServers`               | `RTCConfiguration`       | STUN/TURN servers: `{ iceServers: [{urls, username?, credential?}], iceTransportPolicy?: 'all' \| 'relay' }` |
 
 ### Optional: Streaming
 
-| Field                     | Type              | Description                                  |
-| ------------------------- | ----------------- | -------------------------------------------- |
-| `codec`                   | `'h264' \| 'av1'` | Video codec. Default: `'h264'`               |
-| `deviceFrameRate`         | `number`          | Target frame rate (e.g. 72, 90)              |
-| `maxStreamingBitrateKbps` | `number`          | Max bitrate in Kbps (e.g. 150000 = 150 Mbps) |
+| Field                     | Type              | Description                                             |
+| ------------------------- | ----------------- | ------------------------------------------------------- |
+| `codec`                   | `'h264' \| 'av1'` | Video codec. Default: `'h264'`                          |
+| `deviceFrameRate`         | `number`          | Target frame rate (e.g. 72, 90)                         |
+| `maxStreamingBitrateKbps` | `number`          | Max bitrate in Kbps (greater than 0 and at most 100000) |
 
 ### Optional: Tracking & Rendering
 
@@ -186,6 +190,7 @@ interface MessageChannel extends Disposable {
 ```typescript
 enum MetricsName {
   RenderFramerate = 'render.framerate', // FPS of rendered frames
+  PoseSendFramerate = 'pose.send_framerate', // FPS of poses sent to server
   PoseToRenderTime = 'render.pose_to_render_time', // ms from pose sent to frame displayed
   StreamingFramerate = 'streaming.framerate', // FPS of received server frames
   StreamingFrameCount = 'streaming.frame_count', // Total valid frames received
@@ -193,7 +198,7 @@ enum MetricsName {
 
 enum MetricsCadence {
   PerFrame = 'frame', // Fired each time a server frame arrives
-  PerRender = 'render', // Fired each client render
+  PerRender = 'render', // Fired on each XR frame cycle (pose send)
 }
 
 type Metrics = Partial<Record<MetricsName, number>>;
@@ -245,6 +250,33 @@ Example with proxy:
 ```
 wss://proxy.example.com:443/192.168.1.100/sign_in?client_type=6&...&token=abc
 ```
+
+## Signaling Headers
+
+Some deployments require additional signaling handshake values. Provide them
+with `signalingHeaders`.
+
+```typescript
+const session = CloudXR.createSession({
+  serverAddress: 'runtime.example.com',
+  serverPort: 49100,
+  useSecureConnection: true,
+  signalingHeaders: {
+    'X-Custom-Signaling': 'value',
+  },
+  gl,
+  referenceSpace,
+  perEyeWidth: 2048,
+  perEyeHeight: 1792,
+});
+```
+
+Browser clients cannot set arbitrary WebSocket request headers directly, so
+CloudXR.js carries signaling headers through `Sec-WebSocket-Protocol`.
+
+Names must be RFC 7230 tokens without the reserved `NV_`/`CXR_` prefix, values
+must be ASCII-printable, and limits apply (≤32 headers, ≤256 B name, ≤4096 B
+value, ≤8192 B total). `connect()` throws on violations.
 
 ---
 
