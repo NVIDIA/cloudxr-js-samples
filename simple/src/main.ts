@@ -30,41 +30,49 @@
  * 6. onXRFrame()            - Render loop: send tracking, receive & display video frames
  */
 
-import { checkCapabilities } from '@helpers/BrowserCapabilities';
-import {
-  getDeviceProfile,
-  resolveDeviceProfileId,
-  type DeviceProfile,
-  type DeviceProfileId,
-} from '@helpers/DeviceProfiles';
-import { loadIWERIfNeeded } from '@helpers/LoadIWER';
-import { overridePressureObserver } from '@helpers/overridePressureObserver';
-import { kPerformanceOptions } from '@helpers/PerformanceProfiles';
-import {
-  enableLocalStorage,
-  getConnectionConfig,
-  getGridFromInputs,
-  getResolutionFromInputs,
-  setupCertificateAcceptanceLink,
-  type CertLinkController,
-  type CertStatusInfo,
-} from '@helpers/utils';
-import { getOrCreateCanvas, logOrThrow } from '@helpers/WebGlUtils';
 import {
   createSession,
   getGridValidationError,
   getGridValidationMessageForConnect,
   getResolutionValidationError,
   getResolutionValidationMessageForConnect,
+  type LogEntry,
   type Session,
   type SessionDelegates,
   type SessionOptions,
   type StreamingError,
+  LogLevel,
+  MicState,
   SessionState,
   validateDepthReprojectionGrid,
   validatePerEyeResolution,
 } from '@nvidia/cloudxr';
 import type { XRDevice } from 'iwer';
+
+import { checkCapabilities } from './utils/BrowserCapabilities';
+import {
+  enableLocalStorage,
+  getConnectionConfig,
+  getGridFromInputs,
+  getResolutionFromInputs,
+  setSelectValueIfAvailable,
+  setupCertificateAcceptanceLink,
+  type CertLinkController,
+  type CertStatusInfo,
+} from './utils/configuration';
+import {
+  getDeviceProfile,
+  resolveDeviceProfileId,
+  type DeviceProfile,
+  type DeviceProfileId,
+} from './utils/DeviceProfiles';
+import { applyTargetFrameRate, FrameRateSession } from './utils/frameRate';
+import { setIWERArBackground } from './utils/IWERBackground';
+import { loadIWERIfNeeded } from './utils/LoadIWER';
+import { requestMicPermission } from './utils/micPermission';
+import { overridePressureObserver } from './utils/overridePressureObserver';
+import { kPerformanceOptions } from './utils/PerformanceProfiles';
+import { getOrCreateCanvas, logOrThrow } from './utils/WebGlUtils';
 
 // Override PressureObserver early to catch errors from buggy browser implementations
 overridePressureObserver();
@@ -98,6 +106,7 @@ class CloudXRClient {
   private validationMessageBox: HTMLElement;
   private validationMessageText: HTMLElement;
   private capabilitiesValid = false;
+  private iwerLoaded = false; // True when IWER (desktop emulator) supplies navigator.xr
   private certStatus: CertStatusInfo = { accepted: true, required: false, verified: true };
   private certLinkController: CertLinkController | null = null;
   private referenceSpaceSelect: HTMLSelectElement;
@@ -119,7 +128,9 @@ class CloudXRClient {
   private deviceProfileWarning: HTMLElement;
   private mediaAddressInput: HTMLInputElement;
   private mediaPortInput: HTMLInputElement;
+  private clientTokenInput: HTMLInputElement;
   private codecSelect: HTMLSelectElement;
+  private micEnabledSelect: HTMLSelectElement;
 
   private deviceProfileId: DeviceProfileId = 'custom';
   private deviceProfile: DeviceProfile = getDeviceProfile('custom');
@@ -131,7 +142,6 @@ class CloudXRClient {
   private gl: WebGL2RenderingContext | null = null; // WebGL context (rendering)
   private baseLayer: XRWebGLLayer | null = null; // Bridge between WebXR and WebGL
   private deviceFrameRate: number = 0; // Target frame rate for XR session
-  private hasSetTargetFrameRate: boolean = false; // Track if we've set target frame rate
 
   private onWebGLInitializedCallback?: (
     gl: WebGL2RenderingContext,
@@ -240,7 +250,9 @@ class CloudXRClient {
     this.deviceProfileWarning = document.getElementById('deviceProfileWarning') as HTMLElement;
     this.mediaAddressInput = document.getElementById('mediaAddress') as HTMLInputElement;
     this.mediaPortInput = document.getElementById('mediaPort') as HTMLInputElement;
+    this.clientTokenInput = document.getElementById('clientToken') as HTMLInputElement;
     this.codecSelect = document.getElementById('codec') as HTMLSelectElement;
+    this.micEnabledSelect = document.getElementById('micEnabled') as HTMLSelectElement;
 
     // Enable localStorage to persist user settings
     enableLocalStorage(this.serverIpInput, 'serverIp');
@@ -267,7 +279,10 @@ class CloudXRClient {
     enableLocalStorage(this.deviceProfileSelect, 'deviceProfile');
     enableLocalStorage(this.mediaAddressInput, 'mediaAddress');
     enableLocalStorage(this.mediaPortInput, 'mediaPort');
+    // clientToken is a secret; keep it ephemeral (read from the input on submit,
+    // never persisted to or logged from localStorage).
     enableLocalStorage(this.codecSelect, 'codec');
+    enableLocalStorage(this.micEnabledSelect, 'micEnabled');
 
     // Update slider value display when it changes
     this.posePredictionFactorInput.addEventListener('input', () => {
@@ -389,6 +404,7 @@ class CloudXRClient {
    */
   private async checkWebXRSupport(): Promise<void> {
     const { supportsImmersive, iwerLoaded } = await loadIWERIfNeeded();
+    this.iwerLoaded = iwerLoaded;
     if (!supportsImmersive) {
       this.showStatus('Immersive mode not supported', 'error');
       this.startButton.disabled = true;
@@ -398,7 +414,8 @@ class CloudXRClient {
     this.startButton.disabled = true;
     this.startButton.innerHTML = 'CONNECT (checking capabilities)';
 
-    const result = await checkCapabilities();
+    // IWER replaces the desktop user agent with its emulated Quest profile, so skip headset firmware checks.
+    const result = await checkCapabilities(iwerLoaded);
     if (!result.success) {
       this.showStatus(
         'Browser does not meet required capabilities:\n' + result.failures.join('\n'),
@@ -577,9 +594,40 @@ class CloudXRClient {
       this.startButton.innerHTML = 'CONNECT (connecting)';
       this.showStatus(`Connecting to Server ${serverIp}:${port}...`, 'info');
 
+      // Snapshot mic preference early so the pre-flight check and onStreamStarted
+      // callback both see the same value.
+      const micEnabled = this.micEnabledSelect.value !== 'false';
+
+      // Request mic permission before entering WebXR — Chrome exits immersive mode
+      // when a getUserMedia dialog appears, so we cache the permission first.
+      const micResult = await requestMicPermission(micEnabled);
+      if (micResult === 'denied') {
+        this.showStatus(
+          'Microphone permission denied — grant mic access, or disable upstream audio and try again.',
+          'error'
+        );
+        // Re-enable the button so the user can act on the "try again" message without
+        // needing a page reload (mirrors what the catch block does on other failures).
+        this.startButton.disabled = false;
+        this.startButton.innerHTML = 'CONNECT';
+        return;
+      }
+      if (micResult === 'unavailable') {
+        // No mic hardware; show a warning but proceed without audio.
+        this.showStatus('No microphone found — connecting without audio.', 'info');
+      }
+
       // Initialize WebGL, XR session, and reference space (only after resolution is valid)
       await this.initializeWebGL();
       await this.createXRSession(immersiveMode, deviceFrameRate);
+
+      // CloudXR must advertise the rate actually used by the headset. Apply and confirm
+      // the target frame rate now, before CloudXR negotiates the stream, to avoid a
+      // producer/consumer pacing mismatch that causes burst/freeze artifacts on Quest 3.
+      this.deviceFrameRate = await applyTargetFrameRate(
+        this.xrSession! as FrameRateSession,
+        deviceFrameRate
+      );
 
       let referenceSpace = await this.getReferenceSpace(referenceSpaceType);
       if (xrOffsetX !== 0 || xrOffsetY !== 0 || xrOffsetZ !== 0) {
@@ -590,7 +638,9 @@ class CloudXRClient {
         referenceSpace = referenceSpace.getOffsetReferenceSpace(offsetTransform);
       }
 
-      // Create CloudXR session and connect to server
+      // Create CloudXR session and connect to server.
+      // Pass micEnabled so createCloudXRSession uses the same snapshot taken above
+      // rather than re-reading the DOM (guards against mid-connect UI toggles).
       await this.createCloudXRSession(
         serverIp,
         port,
@@ -600,7 +650,8 @@ class CloudXRClient {
         reprojectionGridCols,
         reprojectionGridRows,
         maxStreamingBitrateKbps,
-        referenceSpace
+        referenceSpace,
+        micEnabled && micResult === 'granted'
       );
 
       // Call extension hook after CloudXR session is created
@@ -676,6 +727,17 @@ class CloudXRClient {
       this.xrSession = await navigator.xr!.requestSession(altMode, options);
     }
 
+    // Register cleanup early so a partial setup failure below still restores
+    // DOM/UI state (e.g. removes the IWER background class from <body>).
+    this.xrSession.addEventListener('end', () => this.handleXRSessionEnd());
+
+    // Under IWER on desktop there is no real passthrough, so the emulator
+    // composites the transparent XR canvas over this page's HTML. Replace that
+    // bleed-through with a neutral dark checkerboard for AR (passthrough)
+    // sessions. No-op on real headsets and in VR (opaque blend mode).
+    const isPassthrough = this.xrSession.environmentBlendMode !== 'opaque';
+    setIWERArBackground(this.iwerLoaded && isPassthrough);
+
     // Create XRWebGLLayer - provides framebuffer for CloudXR to render into
     const xrWebGLLayerAntialias =
       this.deviceProfile.web?.xrWebGLLayerAntialias ?? kPerformanceOptions.xrWebGLLayer_antialias;
@@ -710,12 +772,8 @@ class CloudXRClient {
       console.info('Local render foveation is not supported');
     }
 
-    // Store frame rate for later use in render loop
     this.deviceFrameRate = deviceFrameRate;
-    this.hasSetTargetFrameRate = false;
-
     this.xrSession.updateRenderState({ baseLayer: this.baseLayer });
-    this.xrSession.addEventListener('end', () => this.handleXRSessionEnd());
     this.xrSession.requestAnimationFrame(this.onXRFrame.bind(this));
   }
 
@@ -743,8 +801,19 @@ class CloudXRClient {
   }
 
   /**
-   * Configure CloudXR session and set up event handlers
-   * Establishes WebRTC connection, receives video stream, sends tracking data
+   * Configure CloudXR session and set up event handlers.
+   * Establishes WebRTC connection, receives video stream, sends tracking data.
+   *
+   * @param serverIp - CloudXR server IP address or hostname.
+   * @param port - Signaling port.
+   * @param proxyUrl - Optional proxy URL for HTTPS signaling routing.
+   * @param perEyeWidth - Per-eye stream width in pixels.
+   * @param perEyeHeight - Per-eye stream height in pixels.
+   * @param reprojectionGridCols - Optional reprojection grid column count.
+   * @param reprojectionGridRows - Optional reprojection grid row count.
+   * @param maxStreamingBitrateKbps - Maximum target streaming bitrate in Kbps.
+   * @param referenceSpace - Resolved XR reference space used for tracking.
+   * @param micEnabled - Whether mic capture should be enabled when the stream starts.
    */
   private async createCloudXRSession(
     serverIp: string,
@@ -755,7 +824,8 @@ class CloudXRClient {
     reprojectionGridCols: number | undefined,
     reprojectionGridRows: number | undefined,
     maxStreamingBitrateKbps: number,
-    referenceSpace: XRReferenceSpace
+    referenceSpace: XRReferenceSpace,
+    micEnabled: boolean
   ): Promise<void> {
     const connectionConfig = getConnectionConfig(serverIp, port, proxyUrl);
 
@@ -769,6 +839,7 @@ class CloudXRClient {
       serverPort: connectionConfig.port,
       useSecureConnection: connectionConfig.useSecureConnection,
       signalingResourcePath: connectionConfig.resourcePath,
+      clientToken: this.clientTokenInput.value.trim() || undefined,
       gl: this.gl!,
       codec: this.codecSelect.value as 'h264' | 'h265' | 'av1',
       perEyeWidth, // Stream resolution: width = perEyeWidth * 2 (side-by-side)
@@ -776,7 +847,7 @@ class CloudXRClient {
       reprojectionGridCols,
       reprojectionGridRows,
       referenceSpace,
-      deviceFrameRate: parseInt(this.deviceFrameRateSelect.value, 10),
+      deviceFrameRate: this.deviceFrameRate, // effective rate confirmed by applyTargetFrameRate
       maxStreamingBitrateKbps,
       enablePoseSmoothing: this.enablePoseSmoothingSelect.value === 'true',
       posePredictionFactor: parseFloat(this.posePredictionFactorInput.value),
@@ -784,9 +855,10 @@ class CloudXRClient {
       useQuestColorWorkaround: this.useQuestColorWorkaroundSelect.value === 'true',
       mediaAddress,
       mediaPort,
+      logLevel: LogLevel.Info, // Deliver Info-and-above SDK logs to onLog
       telemetry: {
         enabled: true,
-        appInfo: { version: '6.2.0', product: 'CloudXR.js WebGL Example' },
+        appInfo: { version: '6.4.0', product: 'CloudXR.js WebGL Example' },
       },
     };
 
@@ -796,6 +868,17 @@ class CloudXRClient {
         this.startButton.innerHTML = 'CONNECT (streaming)';
         this.exitButton.style.display = 'block';
         this.showStatus('Streaming started!', 'success');
+        // Enable upstream mic capture only when the user opted in.
+        if (micEnabled) {
+          const ok = this.cloudxrSession?.setMicEnabled(true);
+          // Warn to aid diagnosis when mic activation is rejected by current session state.
+          if (!ok)
+            console.warn('[CloudXR] setMicEnabled(true) returned false (session not active?)');
+        }
+      },
+      onMicStateUpdate: (state: MicState) => {
+        // Log every mic transition for permission/device debugging.
+        console.info('[CloudXR] Mic state:', MicState[state]);
       },
       onStreamStopped: (error?: StreamingError) => {
         if (error) {
@@ -828,6 +911,19 @@ class CloudXRClient {
         this.startButton.disabled = false;
         this.startButton.innerHTML = 'CONNECT';
       },
+      onLog: (entries: LogEntry[]) => {
+        for (const { level, message } of entries) {
+          const print =
+            level === LogLevel.Error
+              ? console.error
+              : level === LogLevel.Warning
+                ? console.warn
+                : level === LogLevel.Debug
+                  ? console.debug
+                  : console.info;
+          print(`[CloudXR] ${message}`);
+        }
+      },
       onWebGLStateChangeBegin: () => console.debug('WebGL state change begin'),
       onWebGLStateChangeEnd: () => console.debug('WebGL state change end'),
       onServerMessageReceived: (messageData: Uint8Array) => {
@@ -851,22 +947,22 @@ class CloudXRClient {
   private async onXRFrame(timestamp: DOMHighResTimeStamp, frame: XRFrame): Promise<void> {
     this.xrSession!.requestAnimationFrame(this.onXRFrame.bind(this));
 
-    // Set target frame rate on first frame only
-    if (!this.hasSetTargetFrameRate && 'updateTargetFrameRate' in this.xrSession!) {
-      this.hasSetTargetFrameRate = true;
-      try {
-        await this.xrSession!.updateTargetFrameRate(this.deviceFrameRate);
-        console.debug(
-          `Target frame rate set to ${this.deviceFrameRate}, current: ${this.xrSession!.frameRate}`
-        );
-      } catch (error) {
-        console.error('Failed to set target frame rate:', error);
-      }
-    }
-
     if (!this.cloudxrSession) {
       console.debug('Skipping frame, CloudXR session not created yet');
       return;
+    }
+
+    // Pump tracking during Connecting so the SDK can read
+    // XRSession.enabledFeatures from these early frames to detect capabilities
+    // (e.g. body-tracking) before the stream starts.
+    // sendTrackingStateToServer returns false (no-op) while Connecting.
+    if (this.cloudxrSession.state === SessionState.Connecting) {
+      try {
+        this.cloudxrSession.sendTrackingStateToServer(timestamp, frame);
+      } catch (error) {
+        console.error('Error in render frame:', error);
+        return;
+      }
     }
 
     if (this.cloudxrSession.state !== SessionState.Connected) {
@@ -894,6 +990,9 @@ class CloudXRClient {
    */
   private handleXRSessionEnd(): void {
     try {
+      // Restore the normal page background (removes the IWER AR checkerboard).
+      setIWERArBackground(false);
+
       if (this.cloudxrSession) {
         this.cloudxrSession.disconnect();
         this.cloudxrSession = null;
@@ -918,7 +1017,6 @@ class CloudXRClient {
     this.baseLayer = null;
     this.xrSession = null;
     this.gl = null;
-    this.hasSetTargetFrameRate = false;
   }
 
   private getWebglAntialias(): boolean {
@@ -1010,14 +1108,14 @@ class CloudXRClient {
     this.reprojectionGridRowsInput.value =
       cloudxr.reprojectionGridRows !== undefined ? String(cloudxr.reprojectionGridRows) : '';
     if (cloudxr.deviceFrameRate !== undefined) {
-      this.setSelectValueIfAvailable(this.deviceFrameRateSelect, String(cloudxr.deviceFrameRate));
+      setSelectValueIfAvailable(this.deviceFrameRateSelect, String(cloudxr.deviceFrameRate));
     }
     if (cloudxr.maxStreamingBitrateKbps !== undefined) {
       const mbps = Math.round(cloudxr.maxStreamingBitrateKbps / 1000);
-      this.setSelectValueIfAvailable(this.maxStreamingBitrateMbpsSelect, String(mbps));
+      setSelectValueIfAvailable(this.maxStreamingBitrateMbpsSelect, String(mbps));
     }
     if (cloudxr.codec) {
-      this.setSelectValueIfAvailable(this.codecSelect, cloudxr.codec);
+      setSelectValueIfAvailable(this.codecSelect, cloudxr.codec);
     }
     if (cloudxr.enablePoseSmoothing !== undefined) {
       this.enablePoseSmoothingSelect.value = String(cloudxr.enablePoseSmoothing);
@@ -1062,13 +1160,6 @@ class CloudXRClient {
       localStorage.setItem('framebufferScaleFactor', this.framebufferScaleFactorInput.value);
     } catch (e) {
       console.warn('Failed to persist profile fields to localStorage:', e);
-    }
-  }
-
-  private setSelectValueIfAvailable(select: HTMLSelectElement, value: string): void {
-    const hasOption = Array.from(select.options).some(option => option.value === value);
-    if (hasOption) {
-      select.value = value;
     }
   }
 }

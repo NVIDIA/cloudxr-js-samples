@@ -1,6 +1,6 @@
 {
   "name": "cloudxr-react-example",
-  "version": "6.2.0",
+  "version": "6.4.0",
   "private": true,
   "description": "React Three Fiber WebXR example for CloudXR",
   "author": "NVIDIA Corporation",
@@ -20,22 +20,22 @@
     "clean": "rimraf build dist"
   },
   "dependencies": {
-    "@nvidia/cloudxr": "dev",
+    "@nvidia/cloudxr": "6.4.0",
     "@preact/signals-react": "^3.10.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.0",
     "@react-three/handle": "^6.6.29",
     "@react-three/uikit": "^1.0.64",
     "@react-three/uikit-default": "^1.0.64",
-    "@react-three/xr": "^6.6.29",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
+    "@react-three/xr": "^6.6.31",
+    "react": "~19.2.5",
+    "react-dom": "~19.2.5",
     "three": "^0.184.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "iwer": "^2.2.1",
+    "iwer": "^2.3.0",
     "@types/three": "^0.184.0",
     "@webxr-input-profiles/assets": "1.0.20",
     "copy-webpack-plugin": "^13.0.0",

@@ -16,12 +16,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noFallthroughCasesInSwitch": true,
-    "jsx": "react-jsx",
-    "baseUrl": ".",
-    "paths": {
-      "@helpers/*": ["./helpers/*"]
-    }
+    "jsx": "react-jsx"
   },
-  "include": ["src/**/*", "../helpers/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

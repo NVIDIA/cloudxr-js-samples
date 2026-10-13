@@ -1,12 +1,67 @@
 # NVIDIA CloudXR.js — Agent Instructions
 
-> Operational guide for AI coding agents working in this codebase.
-> For detailed API types, see [agent-api-reference.md](agent-api-reference.md).
-> For a coding-focused quick reference, see [SKILL.md](SKILL.md).
+> **Applies to:** AI agents helping a user **consume** the CloudXR.js SDK in a sample/integration app.
+> **Read this when:** Touching sample files, scaffolding a new client app, or answering "how do I integrate `@nvidia/cloudxr` in my app?".
+> For working **on** the SDK source itself, see the repo-root [AGENTS.md](../AGENTS.md). For detailed API types, see [agent-api-reference.md](agent-api-reference.md). For a coding-focused quick reference, see [SKILL.md](SKILL.md).
 
 ## What This Is
 
 CloudXR.js is a **TypeScript SDK** that streams VR/AR from a GPU server to a web browser via WebRTC. The server renders; the browser displays video and sends back head/hand tracking.
+
+## Code Quality
+
+All new and modified code in the repo must meet these standards before merge.
+
+### Formatting and lint
+
+- Conform to **Prettier** and **ESLint**.
+- Before push, run:
+  ```bash
+  npm run format:check   # verify
+  npm run format         # auto-fix lint + Prettier
+  ```
+- Common failures: Prettier drift in touched files, `import/order` violations.
+
+### Documentation
+
+- **Every named function, method, class, and interface** must have a JSDoc block (`/** … */`) describing its purpose. Use `@param`, `@returns`, and `@throws` where they add clarity. Arrow functions and anonymous function expressions do not require JSDoc, but should still have concise inline comments when they introduce a logical code block.
+- **Tests:** `describe` blocks, `it`/`test` cases, callbacks, and local test helpers do not require JSDoc. Test function names and assertions should be strongly readable from their definitions; prefer renaming or clearer assertions over adding JSDoc in test files.
+- **Inside every function or method body you add or change**, each logical step must have a short `//` comment on the line **immediately above** the code it describes. A logical step includes: guards and early returns, branches (`if` / `else`), loops, I/O (send, parse, read, write), mutations (assign, push, delete, clear), and cleanup.
+- **Blank-line rule:** put one empty line before each `//` comment and one empty line before the next code step when the previous step ended with code (not a comment). Match the spacing in `examples/hub/src/hub/cors.ts`.
+- Comments explain **why**, **protocol**, or **constraints** — not what the syntax literally does. Do not restate the code (`// increment i`).
+- **Complex logic** (non-obvious control flow, wire formats, timing, security) must have enough comment context that a reader unfamiliar with the file can follow without guessing.
+- **Before finishing:** scan each edited function body top to bottom; if any logical step has no comment directly above it, add one.
+
+**Good (pattern to follow):**
+
+```typescript
+const extra = new Set<string>();
+if (!envValue) return extra;
+
+// Split comma-separated origins and store normalized values for exact Set lookup at request time.
+for (const part of envValue.split(',')) {
+  const normalized = normalizeConfiguredCorsOrigin(part.trim());
+  if (normalized) extra.add(normalized);
+}
+return extra;
+```
+
+**Bad (missing step comments and blank lines):**
+
+```typescript
+const extra = new Set<string>();
+if (!envValue) return extra;
+for (const part of envValue.split(',')) {
+  const normalized = normalizeConfiguredCorsOrigin(part.trim());
+  if (normalized) extra.add(normalized);
+}
+return extra;
+```
+
+### Style
+
+- Code must be **readable and concise**: small focused functions, clear names, shallow nesting. Step comments are required documentation, not bloat — do not omit them to save lines.
+- Explain **why** and any constraints (security, browser quirks, mixed content, etc.) in those step comments.
 
 ## Commands
 
@@ -105,6 +160,44 @@ Button IDs: `xr-standard-trigger`, `xr-standard-squeeze`, `xr-standard-thumbstic
 - XR session must be active (after CONNECT) for poses to affect rendering
 - Positions are in **meters** — 1 cm = 0.01, 10 cm = 0.10
 - For smooth motion, step incrementally (0.005 m per step with 100 ms delays)
+
+## Documentation and Formatting
+
+When writing or editing sample code (including each sample's local utilities), follow these rules.
+
+### JSDoc on all code
+
+Use **JSDoc-style block comments** (`/** ... */`) on every function, method, class, interface, type alias, and enum you add or change. In TypeScript this is the same family as TSDoc; `@param` and `@returns` tags are required where they apply.
+
+- **Every parameter** must have a `@param name - description` line.
+- **Non-void return values** must have a `@returns description` line.
+- **Classes and interfaces** get a summary comment; document each public property on interfaces.
+- **No undocumented blocks** — do not leave a function, method, class, or interface without a doc comment. Inline implementation details may stay uncommented only when the surrounding function doc already explains intent.
+
+Example (match `examples/react/src/utils/configuration.ts`):
+
+```typescript
+/**
+ * Sets the select value only when the option exists.
+ * @param select - The select element to update
+ * @param value - The value to apply if an option matches
+ */
+export function setSelectValueIfAvailable(select: HTMLSelectElement, value: string): void {
+  // ...
+}
+```
+
+### Lint and Prettier
+
+All example code must pass the repo’s ESLint and Prettier checks. From the repository root:
+
+```bash
+npm run lint:check
+npm run prettier:check  # Prettier formatting
+npm run format          # Auto-fix lint + format when needed
+```
+
+Run these before considering example work complete. Do not disable lint rules or Prettier overrides to bypass failures — fix the code instead.
 
 ## Boundaries
 
